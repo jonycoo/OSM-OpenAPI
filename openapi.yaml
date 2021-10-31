@@ -848,7 +848,22 @@ paths:
             <li>When a way has nodes that do not exist or are not visible (i.e. deleted): <tt>"Way #{id} requires the nodes with id in (#{missing_ids}), which either do not exist, or are not visible."</tt></li>
             <li>When a relation has elements that do not exist or are not visible: <tt>"Relation with id #{id} cannot be saved due to #{element} with id #{element.id}"</tt></li>
 
-
+  /echo:
+    post:
+      summary: echo to see request and response version of an abject
+      operationId: echo
+      requestBody:
+        content:
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Relation'
+      responses:
+        '200':
+          description: echo
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Relation'
 
 
 components:
