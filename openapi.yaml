@@ -1,0 +1,223 @@
+openapi: 3.0.2
+servers:
+  - url: https://master.apis.dev.openstreetmap.org
+    description: Development
+  - url: https://api.openstreetmap.org
+    description: Production
+info:
+  description: >-
+    This is the OSM Edit Api written as a OAS3 YAML file
+
+  version: 0.0.1
+  title: OSM-OpenAPI
+tags:
+  - name: Miscellaneous
+    description: Miscellaneous informative 
+  - name: Changesets
+    description: set of Changes
+  - name:  Changeset discussion
+    description: Discussions to a Changeset
+  - name:  Elements
+    description: Nodes, Ways, Relations
+  - name:  GPS traces
+    description: Operations on GPS-Traces
+  - name:  user data
+    description: Permissions and data
+  - name:  Map notes
+    description: Notes on Places
+    
+paths:
+  /api/versions:
+    get:
+      tags:
+        - Miscellaneous
+      summary: Available API versions
+      operationId: versions
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Osm'
+                  - type: object
+                    properties:
+                      api:
+                        type: array
+                        xml:
+                          wrapped: true
+                        items:
+                          type: string
+                          example: '0.6'
+                          xml:
+                            name: version
+  /api/capabilities:
+    get:
+      tags:
+        - Miscellaneous
+      summary: Available API versions
+      operationId: capability
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Osm'
+                  - type: object
+                    properties:
+                      api:
+                        properties:
+                          version:
+                            properties:
+                              minimum:
+                                type: string
+                                example: '0.6'
+                                xml:
+                                  attribute: true
+                              maximum:
+                                type: string
+                                example: '0.6'
+                                xml:
+                                  attribute: true
+                          area:
+                            properties:
+                              maximum:
+                                type: string
+                                example: '0.25'
+                                xml:
+                                  attribute: true
+                          note_area:
+                            properties:
+                              maximum:
+                                type: string
+                                example: '25'
+                                xml:
+                                  attribute: true
+                          tracepoints:
+                            properties:
+                              per_page:
+                                type: string
+                                example: '5000'
+                                xml:
+                                  attribute: true
+                          waynodes:
+                            properties:
+                              maximum:
+                                type: string
+                                example: '2000'
+                                xml:
+                                  attribute: true
+                          changesets:
+                            properties:
+                              maximum_elements:
+                                type: string
+                                example: '10000'
+                                xml:
+                                  attribute: true
+                          timeout:
+                            properties:
+                              seconds:
+                                type: string
+                                example: '300'
+                                xml:
+                                  attribute: true
+                          status:
+                            properties:
+                              database:
+                                type: string
+                                enum:
+                                  - online
+                                  - offline
+                                xml:
+                                  attribute: true
+                              api:
+                                type: string
+                                enum:
+                                  - online
+                                  - offline
+                                xml:
+                                  attribute: true
+                              gpx:
+                                type: string
+                                enum:
+                                  - online
+                                  - offline
+                                xml:
+                                  attribute: true
+                      policy:
+                        properties:
+                          immagery:
+                            properties:
+                              imagery:
+                                type: array
+                                items:
+                                  properties:
+                                    regex:
+                                      type: string
+                                      example: '.*\.google(apis)?\..*/(vt|kh)[\?/].*([xyz]=.*){3}.*'
+                                      xml:
+                                        attribute: true
+                                  xml:
+                                    wrapped: true
+                                    name: blacklist
+  /api/0.6/map:
+    get:
+      tags:
+        - Miscellaneous
+      summary: Available API versions
+      operationId: map_data
+      parameters:
+        - name: bbox
+          in: query
+          description: Status values that need to be considered for filter
+          required: false
+          schema:
+            type: string
+            example: 1.4, 2.7, 3.9, 5.2
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Osm'
+                  - type: object
+      
+components:
+  schemas:
+    Osm:
+      properties:
+        version:
+          type: string
+          example: 0.6
+          xml:
+            attribute: true
+        generator:
+          type: string
+          example: OpenStreetMap server
+          xml:
+            attribute: true
+        copyright:
+          type: string
+          example: OpenStreetMap and contributors
+          xml:
+            attribute: true
+        attribution:
+          type: string
+          example: https://www.openstreetmap.org/copyright
+          xml:
+            attribute: true
+        license:
+          type: string
+          example: https://opendatacommons.org/licenses/odbl/1-0/
+          xml:
+            attribute: true
+      xml:
+        name: osm
+
+
