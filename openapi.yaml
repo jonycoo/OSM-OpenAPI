@@ -21,7 +21,7 @@ tags:
     description: Nodes, Ways, Relations
   - name: GPS traces
     description: Operations on GPS-Traces
-  - name: user data
+  - name: User data
     description: Permissions and data
   - name: Map notes
     description: Notes on Places
@@ -329,6 +329,10 @@ paths:
                         <permission name="allow_write_gpx"/>
                       </permissions>
                     </osm>
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
 
   /api/0.6/changeset/create:
     put:
@@ -359,11 +363,15 @@ paths:
           description: error parsing the xml
         '405':
           description: If the request is not a HTTP PUT request
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
 
   /api/0.6/changeset/{id}:
     get:
       tags:
-      - Changesets
+        - Changesets
       summary: get specific changeset
       operationId: changesetById
       parameters:
@@ -396,7 +404,7 @@ paths:
           description: When no changeset with the given id could be found.
     put:
       tags:
-      - Changesets
+        - Changesets
       summary: Update Changeset
       operationId: updateChangeset
       parameters:
@@ -439,8 +447,19 @@ paths:
           description: If the request is not a HTTP PUT request
         '409':
           description: >
-            If the changeset in question has already been closed (either by the user itself or as a result of the auto-closing feature). A message with the format "The changeset #id was closed at #closed_at." is returned
+            If the changeset in question has already been closed.
+            If, while uploading, the max. size of the changeset is exceeded.
             Or if the user trying to update the changeset is not the same as the one that created it
+            Or if the diff contains elements with changeset IDs which don't match the changeset ID that the diff was uploaded to
+            Or any of the error messages that could occur as a result of a create, update or delete operation for one of the elements
+          content:
+            text/xml:
+              schema:
+                description: A message with the format "The changeset #id was closed at #closed_at."
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
 
   /api/0.6/changeset/{id}/close:
     put:
@@ -467,9 +486,13 @@ paths:
           description: >
             If the changeset in question has already been closed (either by the user itself or as a result of the auto-closing feature). A message with the format "The changeset #id was closed at #closed_at." is returned
             Or if the user trying to update the changeset is not the same as the one that created it
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
 
   /api/0.6/changeset/{id}/download:
-    put:
+    get:
       tags:
         - Changesets
       summary: get a OsmChange Document of a changeset
@@ -498,12 +521,66 @@ paths:
         '404':
           description: When no changeset with the given id could be found
 
-  /api/0.6/changeset/#id/expand_bbox:
+  /api/0.6/changeset/{id}/upload:
+    post:
+      tags:
+        - Changesets
+      summary: Upload Changes as OsmChange Document
+      operationId: uploadChangeset
+      parameters:
+        - name: id
+          in: path
+          description: The id of the changeset for which the OsmChange is requested.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          text/xml:
+            schema:
+              type: object
+              description: an <a href="https://wiki.openstreetmap.org/wiki/OsmChange">OsmChange</a> Document
+              example: >
+                <osmChange version="0.6" generator="acme osm editor">
+                    <modify>
+                        <node id="1234" changeset="42" version="2" lat="12.1234567" lon="-8.7654321">
+                            <tag k="amenity" v="school"/>
+                        </node>
+                    </modify>
+                </osmChange>
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/xml:
+              schema:
+                description: can have any node/way/relation with any combination of old_id/new_id/new_version
+                example: >
+                  <diffResult generator="OpenStreetMap Server" version="0.6">
+                    <node|way|relation old_id="#" new_id="#" new_version="#"/>
+                    ...
+                  </diffResult>
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+
+  /api/0.6/changeset/{id}/expand_bbox:
     post:
       tags:
         - Changesets
       summary: expands Changeset bbox to fit all changes
+      # operationId: exandBbox
       deprecated: true
+      parameters:
+        - name: id
+          in: path
+          description: The id of the changeset for which the OsmChange is requested.
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '404':
           description: endpoint is gone
@@ -513,8 +590,8 @@ paths:
       tags:
         - Changesets
       summary: Query/Search changesets
-      description: Update an existing pet by Id
-      operationId: updatePet
+      description: Query for Changesets meeting certain critiria
+      operationId: queryChangsets
       parameters:
         - name: bbox
           in: query
@@ -533,7 +610,7 @@ paths:
             items:
               type: number
             example: '1.4,2.7,3.9,5.6'
-
+          explode: false
         - name: time
           in: query
           description: 'Find changesets that were closed after T1 and created before T2. In other words, any changesets that were open at some time during the given time range T1 to T2.'
@@ -544,16 +621,16 @@ paths:
             items:
               type: string
               format: date-time
-            example: hallo
+          explode: false
         - name: changesets
           in: query
           description: Finds changesets with the specified ids
           schema:
             type: array
             items:
-              type: string
-              format: date-time
-            example: hallo
+              type: integer
+              format: int64
+          explode: false
         - name: open
           in: query
           description: 'Only finds changesets that are still open but excludes changesets that are closed or have reached the element limit for a changeset'
@@ -564,16 +641,17 @@ paths:
           description: 'Only finds changesets that are closed or have reached the element limit'
           schema:
             type: boolean
-        - name: user # TODO only if not uid
+        - name: display_name # TODO only if not uid
           in: query
-          description: username
+          description: username. Either username <strong>OR</strong> uid can be provided.
           schema:
             type: string
-        - name: uid # TODO only if not user
+        - name: user # TODO only if not user
           in: query
-          description: user id
+          description: user id. Either username <strong>OR</strong> uid can be provided.
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         '200':
           description: Successful operation
@@ -585,152 +663,192 @@ paths:
                   - type: array
                     items:
                       $ref: '#/components/schemas/Changeset'
+        '400':
+          description: 'On misformed parameters. In particular, trying to provide both the UID and display name as user query parameters will result in this error.'
+          content:
+            text/plain:
+              schema:
+                description: A text message explaining the error.
+
+
+
+  /api/0.6/changeset/{id}/comment:
+    post:
+      tags:
+        - Changeset discussion
+      summary: current Permissions of logged in user
+      description: posts a comment n a Changeset
+      operationId: discussionComment
+      parameters:
+        - name: id
+          in: path
+          description: 'The id of the changeset.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Osm'
+                  - type: object
+                    properties:
+                      changeset:
+                        $ref: '#/components/schemas/Changeset'
+        '400':
+          description: if the text field was not present
+        '409':
+          description: The changeset is not closed
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+
+  /api/0.6/changeset/{id}/subscribe:
+    post:
+      tags:
+        - Changeset discussion
+      summary: subscribe to Changeset discussion
+      operationId: discussionSubscribe
+      parameters:
+        - name: id
+          in: path
+          description: 'The id of the changeset'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Osm'
+                  - type: object
+                    properties:
+                      changeset:
+                        $ref: '#/components/schemas/Changeset'
+        '409':
+          description: if the user is already subscribed to this changeset
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+
+  /api/0.6/changeset/{id}/unsubscribe:
+    post:
+      tags:
+        - Changeset discussion
+      summary: Unsubscribe from Changeset discussion
+      operationId: discussionUnsubscribe
+      parameters:
+        - name: id
+          in: path
+          description: 'The id of the changeset.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Osm'
+                  - type: object
+                    properties:
+                      changeset:
+                        $ref: '#/components/schemas/Changeset'
+        '404':
+          description: if the user is not subscribed to this changeset
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+
+  /api/0.6/{elementType}/create:
+    put:
+      tags:
+        - Elements
+      summary: creates a new Element
+      parameters:
+        - name: elementType
+          in: path
+          description: Type of Osm core data element
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/xml:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Node'
+                - $ref: '#/components/schemas/Way'
+                - $ref: '#/components/schemas/Relation'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                description: id of created element
+        '400':
+          description: >
+            <li>When there are errors parsing the XML. A text message explaining the error is returned.</li>
+            <li>When a changeset ID is missing (unfortunately the error messages are not consistent)</li>
+            <li>When a node is outside the world</li>
+            <li>When there are too many nodes for a way</li>
+
+        '405':
+          description: <li>If the request is not a HTTP PUT request</li
+        '409':
+          description: >
+            <li>If the changeset in question has already been closed. A message with the format
+              <tt>"The changeset #id was closed at #closed_at."</tt> is returned</li>
+            <li>Or if the user trying to update the changeset is not the same as the one that created it</li>
+        '412':
+          description: >
+            <li>When a way has nodes that do not exist or are not visible (i.e. deleted): <tt>"Way #{id} requires the nodes with id in (#{missing_ids}), which either do not exist, or are not visible."</tt></li>
+            <li>When a relation has elements that do not exist or are not visible: <tt>"Relation with id #{id} cannot be saved due to #{element} with id #{element.id}"</tt></li>
+
 
 
 
 components:
-  schemas:
-    Osm:
-      properties:
-        version:
-          type: string
-          readOnly: true
-          example: 0.6
-          xml:
-            attribute: true
-        generator:
-          type: string
-          readOnly: true
-          example: OpenStreetMap server
-          xml:
-            attribute: true
-        copyright:
-          type: string
-          readOnly: true
-          example: OpenStreetMap and contributors
-          xml:
-            attribute: true
-        attribution:
-          type: string
-          readOnly: true
-          example: https://www.openstreetmap.org/copyright
-          xml:
-            attribute: true
-        license:
-          type: string
-          readOnly: true
-          example: https://opendatacommons.org/licenses/odbl/1-0/
-          xml:
-            attribute: true
-      xml:
-        name: osm
-    Changeset:
-      properties:
-        id:
-          type: string
-          example: 10
-          readOnly: true
-          xml:
-            attribute: true
-        user:
-          type: string
-          example: fred
-          readOnly: true
-          xml:
-            attribute: true
-        uid:
-          type: string
-          example: 123
-          readOnly: true
-          xml:
-            attribute: true
-        created_at:
-          type: string
-          format: date-time
-          example: '2008-11-08T19:07:39+01:00'
-          readOnly: true
-          xml:
-            attribute: true
-        open:
-          type: string
-          enum:
-            - 'true'
-            - 'false'
-          readOnly: true
-          xml:
-            attribute: true
-        min_lon:
-          type: number
-          readOnly: true
-          xml:
-            attribute: true
-        min_lat:
-          type: number
-          readOnly: true
-          xml:
-            attribute: true
-        max_lon:
-          type: number
-          readOnly: true
-          xml:
-            attribute: true
-        max_lat:
-          type: number
-          readOnly: true
-          xml:
-            attribute: true
-        tag:
-          type: array
-          items:
-            type: object
-            properties:
-              key: # TODO comment is required
-                type: string
-                example: comment
-                xml:
-                  name: k
-                  attribute: true
-              value:
-                type: string
-                example: Added some Trees
-                xml:
-                  name: v
-                  attribute: true
-            xml:
-              wrapped: true
-        discussion:
-          type: object
-          properties:
-            comment:
-              type: array
-              items:
-                type: object
-                properties:
-                  date:
-                    type: string
-                    format: date-time
-                    example: '2015-01-01T18:56:48Z'
-                    readOnly: true
-                    xml:
-                      attribute: true
-                  uid:
-                    type: string
-                    example: 1841
-                    readOnly: true
-                    xml:
-                      attribute: true
-                  user:
-                    type: string
-                    example: metaodi
-                    readOnly: true
-                    xml:
-                      attribute: true
-                  text:
-                    type: string
-                    example: Did you verify those street names?
-                xml:
-                  wrapped: true
-
-
-      xml:
-        name: changeset
