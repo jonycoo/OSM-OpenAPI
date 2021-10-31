@@ -532,7 +532,7 @@ paths:
             maxItems: 4
             items:
               type: number
-            example: 1.4,2.7,3.9,5.6
+            example: '1.4,2.7,3.9,5.6'
 
         - name: time
           in: query
@@ -545,19 +545,46 @@ paths:
               type: string
               format: date-time
             example: hallo
-
-        - name: user
+        - name: changesets
+          in: query
+          description: Finds changesets with the specified ids
+          schema:
+            type: array
+            items:
+              type: string
+              format: date-time
+            example: hallo
+        - name: open
+          in: query
+          description: 'Only finds changesets that are still open but excludes changesets that are closed or have reached the element limit for a changeset'
+          schema:
+            type: boolean
+        - name: closed
+          in: query
+          description: 'Only finds changesets that are closed or have reached the element limit'
+          schema:
+            type: boolean
+        - name: user # TODO only if not uid
           in: query
           description: username
           schema:
             type: string
-
-        - name: uid
+        - name: uid # TODO only if not user
           in: query
           description: user id
           schema:
             type: string
-
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Osm'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Changeset'
 
 
 
@@ -703,6 +730,7 @@ components:
                     example: Did you verify those street names?
                 xml:
                   wrapped: true
+
+
       xml:
         name: changeset
-
