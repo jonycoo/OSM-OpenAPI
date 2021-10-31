@@ -12,20 +12,19 @@ info:
   title: OSM-OpenAPI
 tags:
   - name: Miscellaneous
-    description: Miscellaneous informative 
+    description: Miscellaneous informative
   - name: Changesets
     description: set of Changes
-  - name:  Changeset discussion
+  - name: Changeset discussion
     description: Discussions to a Changeset
-  - name:  Elements
+  - name: Elements
     description: Nodes, Ways, Relations
-  - name:  GPS traces
+  - name: GPS traces
     description: Operations on GPS-Traces
-  - name:  user data
+  - name: user data
     description: Permissions and data
-  - name:  Map notes
+  - name: Map notes
     description: Notes on Places
-    
 paths:
   /api/versions:
     get:
@@ -37,7 +36,7 @@ paths:
         '200':
           description: Successful operation
           content:
-            application/xml:
+            text/xml:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/Osm'
@@ -52,6 +51,10 @@ paths:
                           example: '0.6'
                           xml:
                             name: version
+              examples:
+                version0.6:
+                  value: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<osm generator=\"OpenStreetMap server\" copyright=\"OpenStreetMap and contributors\" attribution=\"https://www.openstreetmap.org/copyright\" license=\"https://opendatacommons.org/licenses/odbl/1-0/\">\n        <api>\n\t\t<version>0.6</version>\n\t</api>\n</osm>\n"
+
   /api/capabilities:
     get:
       tags:
@@ -62,7 +65,7 @@ paths:
         '200':
           description: Successful operation
           content:
-            application/xml:
+            text/xml:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/Osm'
@@ -71,6 +74,9 @@ paths:
                       api:
                         properties:
                           version:
+                            description: >-
+                              Version minimum and maximum are the API call
+                              versions that the server will accept
                             properties:
                               minimum:
                                 type: string
@@ -83,6 +89,9 @@ paths:
                                 xml:
                                   attribute: true
                           area:
+                            description: >-
+                              Area maximum is the maximum area in square degrees
+                              that can be queried by API calls.
                             properties:
                               maximum:
                                 type: string
@@ -97,6 +106,9 @@ paths:
                                 xml:
                                   attribute: true
                           tracepoints:
+                            description: >-
+                              Tracepoints per_page is the maximum number of
+                              points in a single GPS trace. (Possibly incorrect)
                             properties:
                               per_page:
                                 type: string
@@ -104,6 +116,9 @@ paths:
                                 xml:
                                   attribute: true
                           waynodes:
+                            description: >-
+                              Waypoints maximum is the maximum number of nodes
+                              that a way may contain.
                             properties:
                               maximum:
                                 type: string
@@ -111,6 +126,10 @@ paths:
                                 xml:
                                   attribute: true
                           changesets:
+                            description: >-
+                              Changesets maximum is the maximum number of
+                              combined nodes, ways and relations that can be
+                              contained in a changeset.
                             properties:
                               maximum_elements:
                                 type: string
@@ -125,11 +144,20 @@ paths:
                                 xml:
                                   attribute: true
                           status:
+                            description: >-
+                              The status element returns either online, readonly
+                              or offline for each of the database, API and GPX
+                              API. The database field is informational, and the
+                              API/GPX-API fields indicate whether a client
+                              should expect read and write requests to work
+                              (online), only read requests to work (readonly) or
+                              no requests to work (offline).
                             properties:
                               database:
                                 type: string
                                 enum:
                                   - online
+                                  - readonly
                                   - offline
                                 xml:
                                   attribute: true
@@ -137,6 +165,7 @@ paths:
                                 type: string
                                 enum:
                                   - online
+                                  - readonly
                                   - offline
                                 xml:
                                   attribute: true
@@ -144,12 +173,18 @@ paths:
                                 type: string
                                 enum:
                                   - online
+                                  - readonly
                                   - offline
                                 xml:
                                   attribute: true
                       policy:
                         properties:
                           immagery:
+                            description: >-
+                              Imagery blacklist lists all aerial and map
+                              sources, which are not permitted for OSM usage due
+                              to copyright. Editors must not show these
+                              resources as background layer.
                             properties:
                               imagery:
                                 type: array
@@ -157,12 +192,37 @@ paths:
                                   properties:
                                     regex:
                                       type: string
-                                      example: '.*\.google(apis)?\..*/(vt|kh)[\?/].*([xyz]=.*){3}.*'
+                                      example: >-
+                                        .*\.google(apis)?\..*/(vt|kh)[\?/].*([xyz]=.*){3}.*
                                       xml:
                                         attribute: true
                                   xml:
                                     wrapped: true
                                     name: blacklist
+              examples:
+                dataLimits:
+                  value: >
+                    <?xml version="1.0" encoding="UTF-8"?>
+                      <osm version="0.6" generator="OpenStreetMap server" copyright="OpenStreetMap and contributors" attribution="https://www.openstreetmap.org/copyright" license="https://opendatacommons.org/licenses/odbl/1-0/">
+                        <api>
+                          <version minimum="0.6" maximum="0.6"/>
+                          <area maximum="0.25"/>
+                          <note_area maximum="25"/>
+                          <tracepoints per_page="5000"/>
+                          <waynodes maximum="2000"/>
+                          <changesets maximum_elements="10000"/>
+                          <timeout seconds="300"/>
+                          <status database="online" api="online" gpx="online"/>
+                        </api>
+                        <policy>
+                          <imagery>
+                            <blacklist regex=".*\.google(apis)?\..*/(vt|kh)[\?/].*([xyz]=.*){3}.*"/>
+                            <blacklist regex="http://xdworld\.vworld\.kr:8080/.*"/>
+                            <blacklist regex=".*\.here\.com[/:].*"/>
+                          </imagery>
+                        </policy>
+                      </osm>
+
   /api/0.6/map:
     get:
       tags:
@@ -172,52 +232,477 @@ paths:
       parameters:
         - name: bbox
           in: query
-          description: Status values that need to be considered for filter
-          required: false
+          description: >-
+            <code>GET /api/0.6/map?bbox=left,bottom,right,top</code><br>
+            <tt><b>left</b></tt> is the longitude of the left (westernmost) side
+            of the bounding box.<br> <tt><b>bottom</b></tt> is the latitude of
+            the bottom (southernmost) side of the bounding box.<br>
+            <tt><b>right</b></tt> is the longitude of the right (easternmost)
+            side of the bounding box.<br> <tt><b>top</b></tt> is the latitude of
+            the top (northernmost) side of the bounding box.
+          required: true
           schema:
-            type: string
-            example: 1.4, 2.7, 3.9, 5.2
-
+            type: array
+            minItems: 4
+            maxItems: 4
+            items:
+              type: number
+            example: 1.4,2.7,3.9,5.6
+          explode: false
       responses:
         '200':
           description: Successful operation
           content:
-            application/xml:
+            text/xml:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/Osm'
                   - type: object
-      
+        '400':
+          description: >-
+            When any of the node/way/relation limits are exceeded, in particular
+            if the call would return more than 50'000 nodes.
+          links:
+            dataLimit:
+              operationId: capability
+              description: Data Return limits as described
+
+        '509':
+          description: 'Error: You have downloaded too much data. Please try again later. see <a href="https://wiki.openstreetmap.org/wiki/Developer_FAQ#I.27ve_been_blocked_from_the_API_for_downloading_too_much._Now_what.3F">Developer FAQ</a>'
+
+  /api/0.6/permissions:
+    get:
+      tags:
+        - Miscellaneous
+      summary: current Permissions of logged in user
+      description: >
+        Currently the following permissions can appear in the result, corresponding directly to the ones used in the OAuth 1.0a application definition.<br>
+        allow_read_prefs (read user preferences)<br>
+        allow_write_prefs (modify user preferences)<br>
+        allow_write_diary (create diary entries, comments and make friends)<br>
+        allow_write_api (modify the map)<br>
+        allow_read_gpx (read private GPS traces)<br>
+        allow_write_gpx (upload GPS traces)<br>
+        allow_write_notes (modify notes)
+      operationId: permissions
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Osm'
+                  - type: object
+                    properties:
+                      permissions:
+                        type: array
+                        items:
+                          properties:
+                            name:
+                              type: string
+                              enum:
+                                - allow_read_prefs
+                                - allow_write_prefs
+                                - allow_write_diary
+                                - allow_write_api
+                                - allow_read_gpx
+                                - allow_write_gpx
+                                - allow_write_notes
+                              example: allow_read_prefs
+                              xml:
+                                name: name
+                                attribute: true
+                          xml:
+                            name: permission
+                        xml:
+                          wrapped: true
+              examples:
+                permissions:
+                  value: >
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <osm version="0.6" generator="OpenStreetMap server">
+                      <permissions>
+                        <permission name="allow_read_prefs"/>
+                        ...
+                        <permission name="allow_read_gpx"/>
+                        <permission name="allow_write_gpx"/>
+                      </permissions>
+                    </osm>
+
+  /api/0.6/changeset/create:
+    put:
+      tags:
+        - Changesets
+      summary: create a new changeset
+      requestBody:
+        content:
+          text/xml:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Osm'
+                - type: object
+                  properties:
+                    changeset:
+                      allOf:
+                        - $ref: '#/components/schemas/Changeset'
+                        - type: object
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: integer
+                example: 11001100
+        '400':
+          description: error parsing the xml
+        '405':
+          description: If the request is not a HTTP PUT request
+
+  /api/0.6/changeset/{id}:
+    get:
+      tags:
+      - Changesets
+      summary: get specific changeset
+      operationId: changesetById
+      parameters:
+        - name: id
+          in: path
+          description: id of reqested changeset
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: include_discussion
+          in: query
+          description: include changeset discussion?
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Osm'
+                  - type: object
+                    properties:
+                      changeset:
+                        $ref: '#/components/schemas/Changeset'
+        '404':
+          description: When no changeset with the given id could be found.
+    put:
+      tags:
+      - Changesets
+      summary: Update Changeset
+      operationId: updateChangeset
+      parameters:
+        - name: id
+          in: path
+          description: 'update Changeset Metadata, only data in this changeset is stored. <strong>Unchanged tags have to be repeated in order to not be deleted.</strong>'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          text/xml:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Osm'
+                - type: object
+                  properties:
+                    changeset:
+                      allOf:
+                        - $ref: '#/components/schemas/Changeset'
+                        - type: object
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Osm'
+                  - type: object
+                    properties:
+                      changeset:
+                        $ref: '#/components/schemas/Changeset'
+        '400':
+          description: When there are errors parsing the XML
+        '404':
+          description: When no changeset with the given id could be found
+        '405':
+          description: If the request is not a HTTP PUT request
+        '409':
+          description: >
+            If the changeset in question has already been closed (either by the user itself or as a result of the auto-closing feature). A message with the format "The changeset #id was closed at #closed_at." is returned
+            Or if the user trying to update the changeset is not the same as the one that created it
+
+  /api/0.6/changeset/{id}/close:
+    put:
+      tags:
+        - Changesets
+      summary: close a changeset
+      operationId: closeChangeset
+      parameters:
+        - name: id
+          in: path
+          description: 'The id of the changeset to close. The user issuing this API call has to be the same that created the changeset.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+        '404':
+          description: When no changeset with the given id could be found
+        '405':
+          description: If the request is not a HTTP PUT request
+        '409':
+          description: >
+            If the changeset in question has already been closed (either by the user itself or as a result of the auto-closing feature). A message with the format "The changeset #id was closed at #closed_at." is returned
+            Or if the user trying to update the changeset is not the same as the one that created it
+
+  /api/0.6/changeset/{id}/download:
+    put:
+      tags:
+        - Changesets
+      summary: get a OsmChange Document of a changeset
+      operationId: downloadChangeset
+      parameters:
+        - name: id
+          in: path
+          description: The id of the changeset for which the OsmChange is requested.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 'Successful operation <br> more documentation to OsmChange can be found <a href="https://wiki.openstreetmap.org/wiki/OsmChange">here</a>'
+          content:
+            text/xml:
+              example: >
+                <osmChange version="0.6" generator="acme osm editor">
+                    <modify>
+                        <node id="1234" changeset="42" version="2" lat="12.1234567" lon="-8.7654321">
+                            <tag k="amenity" v="school"/>
+                        </node>
+                    </modify>
+                </osmChange>
+        '404':
+          description: When no changeset with the given id could be found
+
+  /api/0.6/changeset/#id/expand_bbox:
+    post:
+      tags:
+        - Changesets
+      summary: expands Changeset bbox to fit all changes
+      deprecated: true
+      responses:
+        '404':
+          description: endpoint is gone
+
+  /api/0.6/changesets:
+    get:
+      tags:
+        - Changesets
+      summary: Query/Search changesets
+      description: Update an existing pet by Id
+      operationId: updatePet
+      parameters:
+        - name: bbox
+          in: query
+          description: >-
+            <code>GET /api/0.6/map?bbox=left,bottom,right,top</code><br>
+            <tt><b>left</b></tt> is the longitude of the left (westernmost) side
+            of the bounding box.<br> <tt><b>bottom</b></tt> is the latitude of
+            the bottom (southernmost) side of the bounding box.<br>
+            <tt><b>right</b></tt> is the longitude of the right (easternmost)
+            side of the bounding box.<br> <tt><b>top</b></tt> is the latitude of
+            the top (northernmost) side of the bounding box.
+          schema:
+            type: array
+            minItems: 4
+            maxItems: 4
+            items:
+              type: number
+            example: 1.4,2.7,3.9,5.6
+
+        - name: time
+          in: query
+          description: 'Find changesets that were closed after T1 and created before T2. In other words, any changesets that were open at some time during the given time range T1 to T2.'
+          schema:
+            type: array
+            minItems: 1
+            maxItems: 2
+            items:
+              type: string
+              format: date-time
+            example: hallo
+
+        - name: user
+          in: query
+          description: username
+          schema:
+            type: string
+
+        - name: uid
+          in: query
+          description: user id
+          schema:
+            type: string
+
+
+
+
 components:
   schemas:
     Osm:
       properties:
         version:
           type: string
+          readOnly: true
           example: 0.6
           xml:
             attribute: true
         generator:
           type: string
+          readOnly: true
           example: OpenStreetMap server
           xml:
             attribute: true
         copyright:
           type: string
+          readOnly: true
           example: OpenStreetMap and contributors
           xml:
             attribute: true
         attribution:
           type: string
+          readOnly: true
           example: https://www.openstreetmap.org/copyright
           xml:
             attribute: true
         license:
           type: string
+          readOnly: true
           example: https://opendatacommons.org/licenses/odbl/1-0/
           xml:
             attribute: true
       xml:
         name: osm
-
+    Changeset:
+      properties:
+        id:
+          type: string
+          example: 10
+          readOnly: true
+          xml:
+            attribute: true
+        user:
+          type: string
+          example: fred
+          readOnly: true
+          xml:
+            attribute: true
+        uid:
+          type: string
+          example: 123
+          readOnly: true
+          xml:
+            attribute: true
+        created_at:
+          type: string
+          format: date-time
+          example: '2008-11-08T19:07:39+01:00'
+          readOnly: true
+          xml:
+            attribute: true
+        open:
+          type: string
+          enum:
+            - 'true'
+            - 'false'
+          readOnly: true
+          xml:
+            attribute: true
+        min_lon:
+          type: number
+          readOnly: true
+          xml:
+            attribute: true
+        min_lat:
+          type: number
+          readOnly: true
+          xml:
+            attribute: true
+        max_lon:
+          type: number
+          readOnly: true
+          xml:
+            attribute: true
+        max_lat:
+          type: number
+          readOnly: true
+          xml:
+            attribute: true
+        tag:
+          type: array
+          items:
+            type: object
+            properties:
+              key: # TODO comment is required
+                type: string
+                example: comment
+                xml:
+                  name: k
+                  attribute: true
+              value:
+                type: string
+                example: Added some Trees
+                xml:
+                  name: v
+                  attribute: true
+            xml:
+              wrapped: true
+        discussion:
+          type: object
+          properties:
+            comment:
+              type: array
+              items:
+                type: object
+                properties:
+                  date:
+                    type: string
+                    format: date-time
+                    example: '2015-01-01T18:56:48Z'
+                    readOnly: true
+                    xml:
+                      attribute: true
+                  uid:
+                    type: string
+                    example: 1841
+                    readOnly: true
+                    xml:
+                      attribute: true
+                  user:
+                    type: string
+                    example: metaodi
+                    readOnly: true
+                    xml:
+                      attribute: true
+                  text:
+                    type: string
+                    example: Did you verify those street names?
+                xml:
+                  wrapped: true
+      xml:
+        name: changeset
 
