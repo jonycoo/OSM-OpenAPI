@@ -867,3 +867,315 @@ paths:
 
 
 components:
+  schemas:
+    Osm:
+      properties:
+        version:
+          type: string
+          readOnly: true
+          example: 0.6
+          xml:
+            attribute: true
+        generator:
+          type: string
+          readOnly: true
+          example: OpenStreetMap server
+          xml:
+            attribute: true
+        copyright:
+          type: string
+          readOnly: true
+          example: OpenStreetMap and contributors
+          xml:
+            attribute: true
+        attribution:
+          type: string
+          readOnly: true
+          example: https://www.openstreetmap.org/copyright
+          xml:
+            attribute: true
+        license:
+          type: string
+          readOnly: true
+          example: https://opendatacommons.org/licenses/odbl/1-0/
+          xml:
+            attribute: true
+      xml:
+        name: osm
+    Changeset:
+      properties:
+        id:
+          type: string
+          example: 10
+          readOnly: true
+          xml:
+            attribute: true
+        user:
+          type: string
+          example: fred
+          readOnly: true
+          xml:
+            attribute: true
+        uid:
+          type: string
+          example: 123
+          readOnly: true
+          xml:
+            attribute: true
+        created_at:
+          type: string
+          format: date-time
+          example: '2008-11-08T19:07:39+01:00'
+          readOnly: true
+          xml:
+            attribute: true
+        open:
+          type: string
+          enum:
+            - 'true'
+            - 'false'
+          readOnly: true
+          xml:
+            attribute: true
+        min_lon:
+          type: number
+          readOnly: true
+          xml:
+            attribute: true
+        min_lat:
+          type: number
+          readOnly: true
+          xml:
+            attribute: true
+        max_lon:
+          type: number
+          readOnly: true
+          xml:
+            attribute: true
+        max_lat:
+          type: number
+          readOnly: true
+          xml:
+            attribute: true
+        tag:
+          type: array
+          items:
+            type: object
+            properties:
+              key: # TODO comment is required
+                type: string
+                example: comment
+                xml:
+                  name: k
+                  attribute: true
+              value:
+                type: string
+                example: Added some Trees
+                xml:
+                  name: v
+                  attribute: true
+            xml:
+              wrapped: true
+        discussion:
+          type: object
+          properties:
+            comment:
+              type: array
+              items:
+                type: object
+                properties:
+                  date:
+                    type: string
+                    format: date-time
+                    example: '2015-01-01T18:56:48Z'
+                    readOnly: true
+                    xml:
+                      attribute: true
+                  uid:
+                    type: string
+                    example: 1841
+                    readOnly: true
+                    xml:
+                      attribute: true
+                  user:
+                    type: string
+                    example: metaodi
+                    readOnly: true
+                    xml:
+                      attribute: true
+                  text:
+                    type: string
+                    example: Did you verify those street names?
+                xml:
+                  wrapped: true
+      xml:
+        name: changeset
+    Tag:
+      properties:
+        key:
+          type: string
+          description: key
+          example: natural
+          xml:
+            name: k
+            attribute: true
+        value:
+          type: string
+          description: value
+          example: tree
+          xml:
+            name: v
+            attribute: true
+      xml:
+        name: tag
+      required:
+        - key
+    Element:
+      properties:
+        id:
+          type: string
+          readOnly: false # need to be set for update
+          description: id of that Node
+          xml:
+            attribute: true
+        version:
+          type: string
+          readOnly: false # needs to be set for update
+          description: longitude of Node
+          xml:
+            attribute: true
+        changeset:
+          type: string
+          description: changeset id of your open changeset
+          xml:
+            attribute: true
+        user:
+          type: string
+          readOnly: true
+          description: longitude of Node
+          xml:
+            attribute: true
+        userId:
+          type: string
+          readOnly: true
+          description: longitude of Node
+          xml:
+            name: uid
+            attribute: true
+        visible:
+          type: string
+          enum:
+            - true
+            - false
+          readOnly: false # can be set at update
+          description: longitude of Node
+          xml:
+            attribute: true
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+          description: last Modified
+          xml:
+            attribute: true
+        tag:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+    Node:
+      allOf:
+        - $ref: '#/components/schemas/Element'
+        - type: object
+          properties:
+            lat:
+              type: string
+              description: latitude of Node
+              xml:
+                attribute: true
+            lon:
+              type: string
+              description: longitude of Node
+              xml:
+                attribute: true
+      required:
+        - changeset
+        - lat
+        - lon
+    Way:
+      allOf:
+        - $ref: '#/components/schemas/Element'
+        - type: object
+          properties:
+            node:
+              type: array
+              minItems: 2
+              maxItems: 2000
+              items:
+                type: object
+                properties:
+                  reference:
+                    type: string
+                    description: id of a node
+                    xml:
+                      name: ref
+                      attribute: true
+              xml:
+                name: nd
+      required:
+        - changeset
+        - node
+    Relation:
+      allOf:
+        - $ref: '#/components/schemas/Element'
+        - type: object
+          properties:
+            member:
+              type: array
+              minItems: 2 #not sure
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: node
+                    enum:
+                      - node
+                      - way
+                      - relation
+                    xml:
+                      attribute: true
+                  role:
+                    type: string
+                    description: <cite>A member of a relation can optionally have a role which describes the part that a particular feature plays within a relation</cite> <a href="https://wiki.openstreetmap.org/wiki/Relation#Roles"><sub>cite</sub></a>
+                    xml:
+                      attribute: true
+                  reference:
+                    type: string
+                    description: id of a node
+                    xml:
+                      name: ref
+                      attribute: true
+          required:
+            - member
+            - type
+            - reference
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    oAuth2:
+      type: oauth2
+      description: For more information, see https://wiki.openstreetmap.org/wiki/OAuth#Registering_your_application_as_OAuth_2.0_consumer
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth2/authorize
+          tokenUrl: /oauth2/token
+          scopes:
+            read_prefs: read their user preferences
+            write_prefs: modify their user preferences
+            write_diary: create diary entries, comments and make friends
+            write_api: modify the map
+            read_gpx: read their private GPS traces
+            write_gpx: upload GPS traces
+            write_notes: modify notes
