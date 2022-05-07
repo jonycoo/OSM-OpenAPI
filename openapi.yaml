@@ -510,7 +510,7 @@ paths:
           description: 'Successful operation <br> more documentation to OsmChange can be found <a href="https://wiki.openstreetmap.org/wiki/OsmChange">here</a>'
           content:
             text/xml:
-              example: >
+              example: > 
                 <osmChange version="0.6" generator="acme osm editor">
                     <modify>
                         <node id="1234" changeset="42" version="2" lat="12.1234567" lon="-8.7654321">
@@ -806,14 +806,17 @@ paths:
       tags:
         - Elements
       summary: creates a new Element
+      operationId: createElement
       parameters:
         - name: elementType
           in: path
           description: Type of Osm core data element
           required: true
           schema:
-            type: integer
-            format: int64
+            enum:
+              - node
+              - way
+              - relation
       requestBody:
         content:
           application/xml:
@@ -847,6 +850,47 @@ paths:
           description: >
             <li>When a way has nodes that do not exist or are not visible (i.e. deleted): <tt>"Way #{id} requires the nodes with id in (#{missing_ids}), which either do not exist, or are not visible."</tt></li>
             <li>When a relation has elements that do not exist or are not visible: <tt>"Relation with id #{id} cannot be saved due to #{element} with id #{element.id}"</tt></li>
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+  
+  /api/0.6/{elementType}/{id}:
+    get:
+      tags:
+        - Elements
+      summary: Returns the XML representation of the element.
+      operationId: getElement
+      parameters:
+        - name: elementType
+          in: path
+          description: Type of Osm core data element
+          required: true
+          schema:
+            enum:
+              - node
+              - way
+              - relation
+        - name: id
+          in: path
+          description: 'The id of the changeset.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: The Element armored with OSM tag #TODO example/Desctiption
+          
+        '404':
+          description: Element of this Type and ID could not be found.
+        '410':
+          description: Element of this ID has been Deleted.
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+
 
   /echo:
     post:
