@@ -571,6 +571,7 @@ paths:
       tags:
         - Changesets
       summary: expands Changeset bbox to fit all changes
+      description: use operation <tt>PUT on path /api/0.6/{elementType}/{id}</tt>
       # operationId: exandBbox
       deprecated: true
       parameters:
@@ -860,7 +861,7 @@ paths:
       tags:
         - Elements
       summary: Returns the XML representation of the element.
-      operationId: getElement
+      operationId: updateElement
       parameters:
         - name: elementType
           in: path
@@ -880,8 +881,14 @@ paths:
             format: int64
       responses:
         '200':
-          description: The Element armored with OSM tag #TODO example/Desctiption
-          
+          description: Successful operation
+          content:
+            application/xml:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Node'
+                  - $ref: '#/components/schemas/Way'
+                  - $ref: '#/components/schemas/Relation'
         '404':
           description: Element of this Type and ID could not be found.
         '410':
@@ -890,6 +897,206 @@ paths:
         - oAuth2:
           - write_api
         - basicAuth: []
+    put:
+      tags:
+        - Elements
+      summary: update Element.
+      operationId: updateElement
+      parameters:
+        - name: elementType
+          in: path
+          description: Type of Osm core data element
+          required: true
+          schema:
+            enum:
+              - node
+              - way
+              - relation
+        - name: id
+          in: path
+          description: 'The id of the changeset.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/xml:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Node'
+                - $ref: '#/components/schemas/Way'
+                - $ref: '#/components/schemas/Relation'
+      responses:
+        '200':
+          description: Successful
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: >
+            <li>When there are errors parsing the XML. A text message explaining the error is returned. This can also happen if you forget to pass the Content-Length header.</li>
+            <li>When a changeset ID is missing</li>
+            <li>When a node is outside the world</li>
+            <li>When there are too many nodes for a way</li>
+        '404': 
+          description: When no element with the given id could be found
+        '409':
+          description: >
+            <li>When the version of the provided element does not match the current database version of the element</li>
+            <li>If the changeset in question has already been closed</li>
+            <li>Or if the user trying to update the changeset is not the same as the one that created it</li>
+        '412':
+          description: >
+            <li>When a way has nodes that do not exist or are not visible (i.e. deleted): "<tt>Way #{id} requires the nodes with id in (#{missing_ids}), which either do not exist, or are not visible.</tt>"</li>
+            <li>When a relation has elements that do not exist or are not visible: "<tt>Relation with id #{id} cannot be saved due to #{element} with id #{element.id}</tt>"</li>
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+    delete:
+      tags:
+        - Elements
+      summary: delete element
+      operationId: deleteElement
+      parameters:
+        - name: elementType
+          in: path
+          description: Type of Osm core data element
+          required: true
+          schema:
+            enum:
+              - node
+              - way
+              - relation
+        - name: id
+          in: path
+          description: 'The id of the changeset.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: an xml representation of the element to be deleted.
+        content:
+          application/xml:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Node'
+                - $ref: '#/components/schemas/Way'
+                - $ref: '#/components/schemas/Relation'
+      responses:
+        '200':
+          description: Successful
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: >
+            <li>When there are errors parsing the XML. A text message explaining the error is returned. This can also happen if you forget to pass the Content-Length header.</li>
+            <li>When a changeset ID is missing</li>
+            <li>When a node is outside the world</li>
+            <li>When there are too many nodes for a way</li>
+            <li>When the version of the provided element does not match the current database version of the element</li>
+        '404': 
+          description: When no element with the given id could be found
+        '409':
+          description: >
+            <li>If the changeset in question has already been closed</li>
+            <li>Or if the user trying to update the changeset is not the same as the one that created it</li>
+        '410':
+          description: Element of this ID has been Deleted.
+        '412':
+          description: >
+            <li>When a node/way/relation is still used by a way/relation: (i.e. deleted): "<tt>Node/Way/Relation #{id} is still used by way/relation #{way.id/relation.id}</tt>"</li>
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+  
+  /api/0.6/{elementType}/{id}/history:
+    get:
+      tags:
+        - Elements
+      summary: returns all versions of an element.
+      operationId: historyElement
+      parameters:
+        - name: elementType
+          in: path
+          description: Type of Osm core data element
+          required: true
+          schema:
+            enum:
+              - node
+              - way
+              - relation
+        - name: id
+          in: path
+          description: 'The id of the changeset.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+            description: Successful operation
+            content:
+              application/xml:
+                schema:
+                  type: array
+                  items:
+                    oneOf:
+                      - $ref: '#/components/schemas/Node'
+                      - $ref: '#/components/schemas/Way'
+                      - $ref: '#/components/schemas/Relation'
+        '404': 
+          description: When no element with the given id could be found
+  /api/0.6/{elementType}/{id}/{version}:
+    get:
+      tags:
+        - Elements
+      summary: returns specific versions of an element.
+      operationId: versionElement
+      parameters:
+        - name: elementType
+          in: path
+          description: Type of Osm core data element
+          required: true
+          schema:
+            enum:
+              - node
+              - way
+              - relation
+        - name: id
+          in: path
+          description: 'The id of the changeset.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: version
+          in: path
+          description: 'The id of the changeset.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+            description: Successful operation
+            content:
+              application/xml:
+                schema:
+                  oneOf:
+                    - $ref: '#/components/schemas/Node'
+                    - $ref: '#/components/schemas/Way'
+                    - $ref: '#/components/schemas/Relation'
+        '404': 
+          description: When no element with the given id could be found
+        
+
 
 
   /echo:
