@@ -874,7 +874,6 @@ paths:
               - relation
         - name: id
           in: path
-          description: 'The id of the changeset.'
           required: true
           schema:
             type: integer
@@ -914,7 +913,6 @@ paths:
               - relation
         - name: id
           in: path
-          description: 'The id of the changeset.'
           required: true
           schema:
             type: integer
@@ -1034,25 +1032,25 @@ paths:
               - relation
         - name: id
           in: path
-          description: 'The id of the changeset.'
           required: true
           schema:
             type: integer
             format: int64
       responses:
         '200':
-            description: Successful operation
-            content:
-              application/xml:
-                schema:
-                  type: array
-                  items:
-                    oneOf:
-                      - $ref: '#/components/schemas/Node'
-                      - $ref: '#/components/schemas/Way'
-                      - $ref: '#/components/schemas/Relation'
+          description: Success
+          content:
+            application/xml:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Node'
+                    - $ref: '#/components/schemas/Way'
+                    - $ref: '#/components/schemas/Relation'
         '404': 
           description: When no element with the given id could be found
+  
   /api/0.6/{elementType}/{id}/{version}:
     get:
       tags:
@@ -1071,21 +1069,19 @@ paths:
               - relation
         - name: id
           in: path
-          description: 'The id of the changeset.'
           required: true
           schema:
             type: integer
             format: int64
         - name: version
           in: path
-          description: 'The id of the changeset.'
           required: true
           schema:
             type: integer
-            format: int64
+            format: int32
       responses:
         '200':
-            description: Successful operation
+            description: Success
             content:
               application/xml:
                 schema:
@@ -1095,6 +1091,367 @@ paths:
                     - $ref: '#/components/schemas/Relation'
         '404': 
           description: When no element with the given id could be found
+  
+  /api/0.6/{elementType}:
+    get:
+      tags:
+        - Elements
+      summary: returns specific versions of an element.
+      operationId: multiVersionElement
+      parameters:
+        - name: elementType
+          in: path
+          description: Type of Osm core data element
+          required: true
+          schema:
+            enum:
+              - node
+              - way
+              - relation
+        - name: node
+          in: query
+          description: format "{elementId}v{elementVersion}" in a comma separated list
+          schema:
+            type: string
+        - name: way
+          in: query
+          description: same as in node
+          schema:
+            type: string
+        - name: relation
+          in: query
+          description: same as in node
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/xml:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Node'
+                    - $ref: '#/components/schemas/Way'
+                    - $ref: '#/components/schemas/Relation'
+        '400':
+          description: On a malformed request
+        '404':
+          description: If one of the elements could not be found (By "not found" is meant never existed in the database, if the object was deleted, it will be returned with the attribute visible="false")
+        '412':
+          description: If the URI was too long (tested to be > 8213 characters in the URI, or > 725 elements for 10 digit IDs when not specifying versions)
+  
+  /api/0.6/{elementType}/{id}/relations:
+    get:
+      tags:
+        - Elements
+      summary: Returns a XML document containing all (not deleted) relations in which the given element is used.
+      description: >
+        There is no error if the node does not exist.
+        If the node does not exist or it isn't used in any ways an empty XML document is returned (apart from the <osm> elements)
+      operationId: relationsOfElement
+      parameters:
+        - name: elementType
+          in: path
+          description: Type of Osm core data element
+          required: true
+          schema:
+            enum:
+              - node
+              - way
+              - relation
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/xml:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Node'
+                    - $ref: '#/components/schemas/Way'
+                    - $ref: '#/components/schemas/Relation'
+  
+  /api/0.6/node/{}/ways:
+    get:
+      tags:
+        - Elements
+      summary: Returns a XML document containing all the (not deleted) ways in which the given node is used.
+      operationId: waysElementRelations
+      parameters:
+        - name: elementType
+          in: path
+          description: Type of Osm core data element
+          required: true
+          schema:
+            enum:
+              - node
+              - way
+              - relation
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/xml:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Node'
+                    - $ref: '#/components/schemas/Way'
+                    - $ref: '#/components/schemas/Relation'
+  
+  /api/0.6/{elementType}/{id}/full:
+    get:
+      tags:
+        - Elements
+      summary: This API call retrieves a way or relation and all other elements referenced by it
+      operationId: fullElementRelations
+      parameters:
+        - name: elementType
+          in: path
+          description: Type of Osm core data element
+          required: true
+          schema:
+            enum:
+              - node
+              - way
+              - relation
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+          content:
+            application/xml:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Node'
+                    - $ref: '#/components/schemas/Way'
+                    - $ref: '#/components/schemas/Relation'
+        '404':
+          description: When no element with the given id could be found
+        '410':
+          description: If the element has been deleted
+  
+  /api/0.6/trackpoints:
+    get:
+      tags:
+        - GPS traces
+      summary: get Trackpoints within bbox
+      description: Use this to retrieve the GPS track points that are inside a given bounding box (formatted in a GPX format).
+      operationId: getTrack
+      parameters:
+        - name: bbox
+          in: query
+          schema:
+            type: array
+            items:
+              type: number
+              format: double
+            minItems: 4
+            maxItems: 4
+        - name: page
+          in: query
+          schema:
+            type: number
+            format: int32
+      responses:
+        '200':
+          description: Success
+          content:
+            application/xml:
+              schema:
+                description: The file format is GPX Version 1.0 which is not the current version. Verify that your tools support it.
+  
+  /api/0.6/gpx/create:
+    post:
+      tags:
+        - GPS traces
+      summary: upload a GPX file
+      operationId: createTrack
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  description: The GPX file containing the track points.
+                description:
+                  description: The trace description. Cannot be empty.
+                tags:
+                  description: A string containing tags for the trace. Can be empty.
+                public:
+                  deprecated: true
+                  description: 1 if the trace is public, 0 if not.
+                visibility:
+                  type: string
+                  enum:
+                    - private
+                    - public
+                    - trackable
+                    - identifiable
+      responses:
+        '200':
+          description: Successful
+          content:
+            text/plain:
+              schema:
+                description: A number representing the ID of the new gpx
+                type: number
+                format: int64
+        '400':
+          description: When the description is empty
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+  
+  /api/0.6/gpx/{id}:
+    put:
+      tags:
+        - GPS traces
+      summary: update a GPX file
+      operationId: updateTrack
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  description: The GPX file containing the track points.
+                description:
+                  description: The trace description. Cannot be empty.
+                tags:
+                  description: A string containing tags for the trace. Can be empty.
+                public:
+                  deprecated: true
+                  description: 1 if the trace is public, 0 if not.
+                visibility:
+                  type: string
+                  enum:
+                    - private
+                    - public
+                    - trackable
+                    - identifiable
+      responses:
+        '200':
+          description: Successful
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+    delete:
+      tags:
+        - GPS traces
+      summary: delete a GPX file
+      operationId: deleteTrack
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+  
+  /api/0.6/gpx/{id}/details:
+    get:
+      tags:
+        - GPS traces
+      summary: metadata of a GPX file
+      operationId: metaTrack
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: details of gpx
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+  
+  /api/0.6/gpx/{id}/data:
+    get:
+      tags:
+        - GPS traces
+      summary: download a GPX file
+      operationId: downloadTrack
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: details of gpx
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
+  
+  /api/0.6/user/gpx_files:
+    get:
+      tags:
+        - GPS traces
+      summary: each public tracks meta data
+      operationId: metaUserTracks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: details of gpx
+      security:
+        - oAuth2:
+          - write_api
+        - basicAuth: []
         
 
 
