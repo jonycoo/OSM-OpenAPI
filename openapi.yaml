@@ -375,13 +375,7 @@ paths:
       summary: get specific changeset
       operationId: changesetById
       parameters:
-        - name: id
-          in: path
-          description: id of reqested changeset
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/chSetId'
         - name: include_discussion
           in: query
           description: include changeset discussion?
@@ -408,13 +402,7 @@ paths:
       summary: Update Changeset
       operationId: updateChangeset
       parameters:
-        - name: id
-          in: path
-          description: 'update Changeset Metadata, only data in this changeset is stored. <strong>Unchanged tags have to be repeated in order to not be deleted.</strong>'
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/chSetId'
       requestBody:
         content:
           text/xml:
@@ -468,13 +456,7 @@ paths:
       summary: close a changeset
       operationId: closeChangeset
       parameters:
-        - name: id
-          in: path
-          description: 'The id of the changeset to close. The user issuing this API call has to be the same that created the changeset.'
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/chSetId'
       responses:
         '200':
           description: Successful operation
@@ -498,13 +480,7 @@ paths:
       summary: get a OsmChange Document of a changeset
       operationId: downloadChangeset
       parameters:
-        - name: id
-          in: path
-          description: The id of the changeset for which the OsmChange is requested.
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/chSetId'
       responses:
         '200':
           description: 'Successful operation <br> more documentation to OsmChange can be found <a href="https://wiki.openstreetmap.org/wiki/OsmChange">here</a>'
@@ -528,13 +504,7 @@ paths:
       summary: Upload Changes as OsmChange Document
       operationId: uploadChangeset
       parameters:
-        - name: id
-          in: path
-          description: The id of the changeset for which the OsmChange is requested.
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/chSetId'
       requestBody:
         content:
           text/xml:
@@ -572,16 +542,10 @@ paths:
         - Changesets
       summary: expands Changeset bbox to fit all changes
       description: use operation <tt>PUT on path /api/0.6/{elementType}/{id}</tt>
-      # operationId: exandBbox
+      operationId: exandBbox
       deprecated: true
       parameters:
-        - name: id
-          in: path
-          description: The id of the changeset for which the OsmChange is requested.
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/chSetId'
       responses:
         '404':
           description: endpoint is gone
@@ -681,13 +645,7 @@ paths:
       description: posts a comment n a Changeset
       operationId: discussionComment
       parameters:
-        - name: id
-          in: path
-          description: 'The id of the changeset.'
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/chSetId'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -725,13 +683,7 @@ paths:
       summary: subscribe to Changeset discussion
       operationId: discussionSubscribe
       parameters:
-        - name: id
-          in: path
-          description: 'The id of the changeset'
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/chSetId'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -767,13 +719,7 @@ paths:
       summary: Unsubscribe from Changeset discussion
       operationId: discussionUnsubscribe
       parameters:
-        - name: id
-          in: path
-          description: 'The id of the changeset.'
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/chSetId'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -809,15 +755,7 @@ paths:
       summary: creates a new Element
       operationId: createElement
       parameters:
-        - name: elementType
-          in: path
-          description: Type of Osm core data element
-          required: true
-          schema:
-            enum:
-              - node
-              - way
-              - relation
+        - $ref: '#/components/parameters/elemType'
       requestBody:
         content:
           application/xml:
@@ -863,21 +801,8 @@ paths:
       summary: Returns the XML representation of the element.
       operationId: updateElement
       parameters:
-        - name: elementType
-          in: path
-          description: Type of Osm core data element
-          required: true
-          schema:
-            enum:
-              - node
-              - way
-              - relation
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/elemType'
+        - $ref: '#/components/parameters/elemId'
       responses:
         '200':
           description: Successful operation
@@ -902,21 +827,8 @@ paths:
       summary: update Element.
       operationId: updateElement
       parameters:
-        - name: elementType
-          in: path
-          description: Type of Osm core data element
-          required: true
-          schema:
-            enum:
-              - node
-              - way
-              - relation
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/elemType'
+        - $ref: '#/components/parameters/elemId'
       requestBody:
         content:
           application/xml:
@@ -959,22 +871,8 @@ paths:
       summary: delete element
       operationId: deleteElement
       parameters:
-        - name: elementType
-          in: path
-          description: Type of Osm core data element
-          required: true
-          schema:
-            enum:
-              - node
-              - way
-              - relation
-        - name: id
-          in: path
-          description: 'The id of the changeset.'
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/elemType'
+        - $ref: '#/components/parameters/elemId'
       requestBody:
         description: an xml representation of the element to be deleted.
         content:
@@ -1021,21 +919,8 @@ paths:
       summary: returns all versions of an element.
       operationId: historyElement
       parameters:
-        - name: elementType
-          in: path
-          description: Type of Osm core data element
-          required: true
-          schema:
-            enum:
-              - node
-              - way
-              - relation
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/elemType'
+        - $ref: '#/components/parameters/elemId'
       responses:
         '200':
           description: Success
@@ -1058,21 +943,8 @@ paths:
       summary: returns specific versions of an element.
       operationId: versionElement
       parameters:
-        - name: elementType
-          in: path
-          description: Type of Osm core data element
-          required: true
-          schema:
-            enum:
-              - node
-              - way
-              - relation
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/elemType'
+        - $ref: '#/components/parameters/elemId'
         - name: version
           in: path
           required: true
@@ -1099,15 +971,7 @@ paths:
       summary: returns specific versions of an element
       operationId: multiVersionElement
       parameters:
-        - name: elementType
-          in: path
-          description: Type of Osm core data element
-          required: true
-          schema:
-            enum:
-              - node
-              - way
-              - relation
+        - $ref: '#/components/parameters/elemType'
         - name: node
           in: query
           description: format "{elementId}v{elementVersion}" in a comma separated list
@@ -1152,21 +1016,8 @@ paths:
         If the node does not exist or it isn't used in any ways an empty XML document is returned (apart from the <osm> elements)
       operationId: relationsOfElement
       parameters:
-        - name: elementType
-          in: path
-          description: Type of Osm core data element
-          required: true
-          schema:
-            enum:
-              - node
-              - way
-              - relation
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/elemType'
+        - $ref: '#/components/parameters/elemId'
       responses:
         '200':
           description: Success
@@ -1187,12 +1038,7 @@ paths:
       summary: all the ways in which the given node is used
       operationId: waysElementRelations
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/elemId'
       responses:
         '200':
           description: Success
@@ -1213,21 +1059,8 @@ paths:
       summary: retrieves a way or relation and all elements referenced by it
       operationId: fullElementRelations
       parameters:
-        - name: elementType
-          in: path
-          description: Type of Osm core data element
-          required: true
-          schema:
-            enum:
-              - node
-              - way
-              - relation
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/elemType'
+        - $ref: '#/components/parameters/elemId'
       responses:
         '200':
           description: Success
@@ -1326,12 +1159,7 @@ paths:
       summary: update a GPX file
       operationId: updateTrack
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/gpxId'
       requestBody:
         content:
           multipart/form-data:
@@ -1367,12 +1195,7 @@ paths:
       summary: delete a GPX file
       operationId: deleteTrack
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/gpxId'
       responses:
         '200':
           description: Successful
@@ -1388,12 +1211,7 @@ paths:
       summary: metadata of a GPX file
       operationId: metaTrack
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/gpxId'
       responses:
         '200':
           description: details of gpx
@@ -1409,12 +1227,7 @@ paths:
       summary: download a GPX file
       operationId: downloadTrack
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/gpxId'
       responses:
         '200':
           description: details of gpx
@@ -1430,12 +1243,7 @@ paths:
       summary: each public tracks meta data
       operationId: metaUserTracks
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+        - $ref: '#/components/parameters/gpxId'
       responses:
         '200':
           description: details of gpx
@@ -1466,6 +1274,43 @@ paths:
 
 
 components:
+  parameters:
+    elemType:
+      name: elemType
+      in: path
+      required: true
+      description: type of the Element
+      schema:
+        enum:
+          - node
+          - way
+          - relation
+
+    elemId:
+      name: id
+      in: path
+      required: true
+      description: id of the Element
+      schema:
+          type: integer
+          format: int64
+    chSetId:
+      name: id
+      in: path
+      required: true
+      description: id of the Element
+      schema:
+          type: integer
+          format: int64
+    gpxId:
+      name: id
+      in: path
+      required: true
+      description: id of the Element
+      schema:
+          type: integer
+          format: int64
+
   schemas:
     Osm:
       properties:
