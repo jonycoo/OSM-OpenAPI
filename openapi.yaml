@@ -1096,7 +1096,7 @@ paths:
     get:
       tags:
         - Elements
-      summary: returns specific versions of an element.
+      summary: returns specific versions of an element
       operationId: multiVersionElement
       parameters:
         - name: elementType
@@ -1146,7 +1146,7 @@ paths:
     get:
       tags:
         - Elements
-      summary: Returns a XML document containing all (not deleted) relations in which the given element is used.
+      summary: all relations in which the given Element is used.
       description: >
         There is no error if the node does not exist.
         If the node does not exist or it isn't used in any ways an empty XML document is returned (apart from the <osm> elements)
@@ -1180,22 +1180,13 @@ paths:
                     - $ref: '#/components/schemas/Way'
                     - $ref: '#/components/schemas/Relation'
   
-  /api/0.6/node/{}/ways:
+  /api/0.6/node/{id}/ways:
     get:
       tags:
         - Elements
-      summary: Returns a XML document containing all the (not deleted) ways in which the given node is used.
+      summary: all the ways in which the given node is used
       operationId: waysElementRelations
       parameters:
-        - name: elementType
-          in: path
-          description: Type of Osm core data element
-          required: true
-          schema:
-            enum:
-              - node
-              - way
-              - relation
         - name: id
           in: path
           required: true
@@ -1219,7 +1210,7 @@ paths:
     get:
       tags:
         - Elements
-      summary: This API call retrieves a way or relation and all other elements referenced by it
+      summary: retrieves a way or relation and all elements referenced by it
       operationId: fullElementRelations
       parameters:
         - name: elementType
@@ -1452,7 +1443,7 @@ paths:
         - oAuth2:
           - write_api
         - basicAuth: []
-        
+             
 
 
 
@@ -1706,7 +1697,6 @@ components:
               xml:
                 attribute: true
       required:
-        - changeset
         - lat
         - lon
     Way:
@@ -1730,7 +1720,6 @@ components:
               xml:
                 name: nd
       required:
-        - changeset
         - node
     Relation:
       allOf:
@@ -1767,6 +1756,11 @@ components:
             - member
             - type
             - reference
+    User:
+      allOf:
+        - $ref: '#/components/schemas/Osm'
+        - type: object
+        
 
   securitySchemes:
     basicAuth:
