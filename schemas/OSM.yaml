@@ -1,0 +1,35 @@
+osm:
+  type: object
+  properties:
+    version:
+      type: string
+      readOnly: true
+      example: 0.6
+      xml:
+        attribute: true
+    generator:
+      type: string
+      readOnly: true
+      example: OpenStreetMap server
+      xml:
+        attribute: true
+    copyright:
+      type: string
+      readOnly: true
+      example: OpenStreetMap and contributors
+      xml:
+        attribute: true
+    attribution:
+      type: string
+      readOnly: true
+      example: https://www.openstreetmap.org/copyright
+      xml:
+        attribute: true
+    license:
+      type: string
+      readOnly: true
+      example: https://opendatacommons.org/licenses/odbl/1-0/
+      xml:
+        attribute: true
+  xml:
+    name: osm

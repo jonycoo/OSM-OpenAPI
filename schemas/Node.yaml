@@ -1,0 +1,19 @@
+Node:
+  type: object
+  allOf:
+    - $ref: './Element.yaml'
+    - type: object
+      properties:
+        lat:
+          type: string
+          description: latitude of Node
+          xml:
+            attribute: true
+        lon:
+          type: string
+          description: longitude of Node
+          xml:
+            attribute: true
+  required:
+    - lat
+    - lon

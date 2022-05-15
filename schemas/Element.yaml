@@ -1,0 +1,54 @@
+Element:
+  type: object
+  properties:
+    id:
+      type: string
+      readOnly: false # need to be set for update
+      description: id of that Node
+      xml:
+        attribute: true
+    version:
+      type: string
+      readOnly: false # needs to be set for update
+      description: longitude of Node
+      xml:
+        attribute: true
+    changeset:
+      type: string
+      description: changeset id of your open changeset
+      xml:
+        attribute: true
+    user:
+      type: string
+      readOnly: true
+      description: longitude of Node
+      xml:
+        attribute: true
+    userId:
+      type: string
+      readOnly: true
+      description: longitude of Node
+      xml:
+        name: uid
+        attribute: true
+    visible:
+      type: string
+      enum:
+        - true
+        - false
+      readOnly: false # can be set at update
+      description: longitude of Node
+      xml:
+        attribute: true
+    timestamp:
+      type: string
+      format: date-time
+      readOnly: true
+      description: last Modified
+      xml:
+        attribute: true
+    tag:
+      type: array
+      items:
+        $ref: './Tag.yaml'
+

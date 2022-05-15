@@ -1,0 +1,21 @@
+Tag:
+  type: object
+  properties:
+    key:
+      type: string
+      description: key
+      example: natural
+      xml:
+        name: k
+        attribute: true
+    value:
+      type: string
+      description: value
+      example: tree
+      xml:
+        name: v
+        attribute: true
+  xml:
+    name: tag
+  required:
+    - key

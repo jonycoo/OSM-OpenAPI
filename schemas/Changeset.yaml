@@ -1,0 +1,108 @@
+Changeset:
+  properties:
+    id:
+      type: string
+      example: 10
+      readOnly: true
+      xml:
+        attribute: true
+    user:
+      type: string
+      example: fred
+      readOnly: true
+      xml:
+        attribute: true
+    uid:
+      type: string
+      example: 123
+      readOnly: true
+      xml:
+        attribute: true
+    created_at:
+      type: string
+      format: date-time
+      example: '2008-11-08T19:07:39+01:00'
+      readOnly: true
+      xml:
+        attribute: true
+    open:
+      type: string
+      enum:
+        - 'true'
+        - 'false'
+      readOnly: true
+      xml:
+        attribute: true
+    min_lon:
+      type: number
+      readOnly: true
+      xml:
+        attribute: true
+    min_lat:
+      type: number
+      readOnly: true
+      xml:
+        attribute: true
+    max_lon:
+      type: number
+      readOnly: true
+      xml:
+        attribute: true
+    max_lat:
+      type: number
+      readOnly: true
+      xml:
+        attribute: true
+    tag:
+      type: array
+      items:
+        type: object
+        properties:
+          key: # TODO comment is required
+            type: string
+            example: comment
+            xml:
+              name: k
+              attribute: true
+          value:
+            type: string
+            example: Added some Trees
+            xml:
+              name: v
+              attribute: true
+        xml:
+          wrapped: true
+    discussion:
+      type: object
+      properties:
+        comment:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date-time
+                example: '2015-01-01T18:56:48Z'
+                readOnly: true
+                xml:
+                  attribute: true
+              uid:
+                type: string
+                example: 1841
+                readOnly: true
+                xml:
+                  attribute: true
+              user:
+                type: string
+                example: metaodi
+                readOnly: true
+                xml:
+                  attribute: true
+              text:
+                type: string
+                example: Did you verify those street names?
+            xml:
+              wrapped: true
+  xml:
+    name: changeset
