@@ -376,7 +376,7 @@ paths:
       summary: get specific changeset
       operationId: changesetById
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
         - name: include_discussion
           in: query
           description: include changeset discussion?
@@ -403,7 +403,7 @@ paths:
       summary: Update Changeset
       operationId: updateChangeset
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       requestBody:
         content:
           text/xml:
@@ -457,7 +457,7 @@ paths:
       summary: close a changeset
       operationId: closeChangeset
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       responses:
         '200':
           description: Successful operation
@@ -481,7 +481,7 @@ paths:
       summary: get a OsmChange Document of a changeset
       operationId: downloadChangeset
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       responses:
         '200':
           description: 'Successful operation <br> more documentation to OsmChange can be found <a href="https://wiki.openstreetmap.org/wiki/OsmChange">here</a>'
@@ -505,7 +505,7 @@ paths:
       summary: Upload Changes as OsmChange Document
       operationId: uploadChangeset
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       requestBody:
         content:
           text/xml:
@@ -546,7 +546,7 @@ paths:
       operationId: exandBbox
       deprecated: true
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       responses:
         '404':
           description: endpoint is gone
@@ -646,7 +646,7 @@ paths:
       description: posts a comment n a Changeset
       operationId: discussionComment
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -684,7 +684,7 @@ paths:
       summary: subscribe to Changeset discussion
       operationId: discussionSubscribe
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -720,7 +720,7 @@ paths:
       summary: Unsubscribe from Changeset discussion
       operationId: discussionUnsubscribe
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -756,7 +756,7 @@ paths:
       summary: creates a new Element
       operationId: createElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
+        - $ref: './parameters/elemType.yaml'
       requestBody:
         content:
           application/xml:
@@ -802,8 +802,8 @@ paths:
       summary: Returns the XML representation of the element.
       operationId: updateElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
       responses:
         '200':
           description: Successful operation
@@ -828,8 +828,8 @@ paths:
       summary: update Element.
       operationId: updateElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
       requestBody:
         content:
           application/xml:
@@ -872,8 +872,8 @@ paths:
       summary: delete element
       operationId: deleteElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
       requestBody:
         description: an xml representation of the element to be deleted.
         content:
@@ -920,8 +920,8 @@ paths:
       summary: returns all versions of an element.
       operationId: historyElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
       responses:
         '200':
           description: Success
@@ -944,8 +944,8 @@ paths:
       summary: returns specific versions of an element.
       operationId: versionElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
         - name: version
           in: path
           required: true
@@ -972,7 +972,7 @@ paths:
       summary: returns specific versions of an element
       operationId: multiVersionElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
+        - $ref: './parameters/elemType.yaml'
         - name: node
           in: query
           description: format "{elementId}v{elementVersion}" in a comma separated list
@@ -1017,8 +1017,8 @@ paths:
         If the node does not exist or it isn't used in any ways an empty XML document is returned (apart from the <osm> elements)
       operationId: relationsOfElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
       responses:
         '200':
           description: Success
@@ -1039,7 +1039,7 @@ paths:
       summary: all the ways in which the given node is used
       operationId: waysElementRelations
       parameters:
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemId.yaml'
       responses:
         '200':
           description: Success
@@ -1060,8 +1060,8 @@ paths:
       summary: retrieves a way or relation and all elements referenced by it
       operationId: fullElementRelations
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
       responses:
         '200':
           description: Success
@@ -1160,7 +1160,7 @@ paths:
       summary: update a GPX file
       operationId: updateTrack
       parameters:
-        - $ref: '#/components/parameters/gpxId'
+        - $ref: './parameters/gpxId.yaml'
       requestBody:
         content:
           multipart/form-data:
@@ -1196,7 +1196,7 @@ paths:
       summary: delete a GPX file
       operationId: deleteTrack
       parameters:
-        - $ref: '#/components/parameters/gpxId'
+        - $ref: './parameters/gpxId.yaml'
       responses:
         '200':
           description: Successful
@@ -1212,7 +1212,7 @@ paths:
       summary: metadata of a GPX file
       operationId: metaTrack
       parameters:
-        - $ref: '#/components/parameters/gpxId'
+        - $ref: './parameters/gpxId.yaml'
       responses:
         '200':
           description: details of gpx
@@ -1228,7 +1228,7 @@ paths:
       summary: download a GPX file
       operationId: downloadTrack
       parameters:
-        - $ref: '#/components/parameters/gpxId'
+        - $ref: './parameters/gpxId.yaml'
       responses:
         '200':
           description: details of gpx
@@ -1244,7 +1244,7 @@ paths:
       summary: each public tracks meta data
       operationId: metaUserTracks
       parameters:
-        - $ref: '#/components/parameters/gpxId'
+        - $ref: './parameters/gpxId.yaml'
       responses:
         '200':
           description: details of gpx
@@ -1256,44 +1256,6 @@ paths:
 
 
 components:
-  parameters:
-    elemType:
-      name: elemType
-      in: path
-      required: true
-      description: type of the Element
-      schema:
-        enum:
-          - node
-          - way
-          - relation
-
-    elemId:
-      name: id
-      in: path
-      required: true
-      description: id of the Element
-      schema:
-          type: integer
-          format: int64
-    chSetId:
-      name: id
-      in: path
-      required: true
-      description: id of the Element
-      schema:
-          type: integer
-          format: int64
-    gpxId:
-      name: id
-      in: path
-      required: true
-      description: id of the Element
-      schema:
-          type: integer
-          format: int64
-        
-
   securitySchemes:
     basicAuth:
       type: http
