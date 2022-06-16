@@ -1216,10 +1216,17 @@ paths:
       responses:
         '200':
           description: details of gpx
+          content:
+            application/xml:
+              schema:
+                type: object
+                $ref: './schemas/GpxDetail.yaml'
       security:
         - oAuth2:
           - write_api
         - basicAuth: []
+  # continue download endpoint
+  # continue list of gpx details
   
   /api/0.6/gpx/{id}/data:
     get:

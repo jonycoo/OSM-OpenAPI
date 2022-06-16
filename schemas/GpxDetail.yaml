@@ -1,0 +1,64 @@
+gpx_file:
+  type: object
+  allOf:
+    - $ref: './OSM.yaml'
+    - type: object
+      parameters:
+        gpx_file: 
+          type: object
+          properties:
+            id:
+              type: string
+              readOnly: true
+              xml:
+                attribute: true
+            name: 
+              type: string
+              readOnly: true
+              example: 'track.gpx'
+              xml:
+                attribute: true
+            lat:
+              type: string
+              readOnly: true
+              xml:
+                attribute: true
+            lon:
+              type: string
+              readOnly: true
+              xml:
+                attribute: true
+            user:
+              type: string
+              readOnly: true
+              xml:
+                attribute: true
+            visibility:
+              type: string
+              enum:
+                - private
+                - public
+                - trackable
+                - identifiable
+              readOnly: true
+              xml:
+                attribute: true
+            pending:
+              type: string
+              enum:
+                - 'true'
+                - 'false'
+              readOnly: true
+              xml:
+                attribute: true
+            timestamp:
+              type: string
+              format: date-time
+              readOnly: true
+              xml:
+                attribute: true
+            description:
+              type: string
+            tag:
+              type: string
+              # TODO make correct, this element can appear multible times in the object
