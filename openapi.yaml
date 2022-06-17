@@ -1,4 +1,4 @@
-openapi: 3.0.2
+openapi: 3.1.0
 servers:
   - url: https://master.apis.dev.openstreetmap.org
     description: Development
@@ -39,7 +39,7 @@ paths:
             text/xml:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Osm'
+                  - $ref: './schemas/OSM.yaml'
                   - type: object
                     properties:
                       api:
@@ -60,6 +60,7 @@ paths:
       tags:
         - Miscellaneous
       summary: Available API versions
+      description: the current limits of operations
       operationId: capability
       responses:
         '200':
@@ -68,7 +69,7 @@ paths:
             text/xml:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Osm'
+                  - $ref: './schemas/OSM.yaml'
                   - type: object
                     properties:
                       api:
@@ -256,7 +257,7 @@ paths:
             text/xml:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Osm'
+                  - $ref: './schemas/OSM.yaml'
                   - type: object
         '400':
           description: >-
@@ -292,7 +293,7 @@ paths:
             text/xml:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Osm'
+                  - $ref: './schemas/OSM.yaml'
                   - type: object
                     properties:
                       permissions:
@@ -344,12 +345,12 @@ paths:
           text/xml:
             schema:
               allOf:
-                - $ref: '#/components/schemas/Osm'
+                - $ref: './schemas/OSM.yaml'
                 - type: object
                   properties:
                     changeset:
                       allOf:
-                        - $ref: '#/components/schemas/Changeset'
+                        - $ref: './schemas/Changeset.yaml'
                         - type: object
       responses:
         '200':
@@ -375,7 +376,7 @@ paths:
       summary: get specific changeset
       operationId: changesetById
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
         - name: include_discussion
           in: query
           description: include changeset discussion?
@@ -389,11 +390,11 @@ paths:
             text/xml:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Osm'
+                  - $ref: './schemas/OSM.yaml'
                   - type: object
                     properties:
                       changeset:
-                        $ref: '#/components/schemas/Changeset'
+                        $ref: './schemas/Changeset.yaml'
         '404':
           description: When no changeset with the given id could be found.
     put:
@@ -402,18 +403,18 @@ paths:
       summary: Update Changeset
       operationId: updateChangeset
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       requestBody:
         content:
           text/xml:
             schema:
               allOf:
-                - $ref: '#/components/schemas/Osm'
+                - $ref: './schemas/OSM.yaml'
                 - type: object
                   properties:
                     changeset:
                       allOf:
-                        - $ref: '#/components/schemas/Changeset'
+                        - $ref: './schemas/Changeset.yaml'
                         - type: object
       responses:
         '200':
@@ -422,11 +423,11 @@ paths:
             text/xml:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Osm'
+                  - $ref: './schemas/OSM.yaml'
                   - type: object
                     properties:
                       changeset:
-                        $ref: '#/components/schemas/Changeset'
+                        $ref: './schemas/Changeset.yaml'
         '400':
           description: When there are errors parsing the XML
         '404':
@@ -456,7 +457,7 @@ paths:
       summary: close a changeset
       operationId: closeChangeset
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       responses:
         '200':
           description: Successful operation
@@ -480,7 +481,7 @@ paths:
       summary: get a OsmChange Document of a changeset
       operationId: downloadChangeset
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       responses:
         '200':
           description: 'Successful operation <br> more documentation to OsmChange can be found <a href="https://wiki.openstreetmap.org/wiki/OsmChange">here</a>'
@@ -504,7 +505,7 @@ paths:
       summary: Upload Changes as OsmChange Document
       operationId: uploadChangeset
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       requestBody:
         content:
           text/xml:
@@ -545,7 +546,7 @@ paths:
       operationId: exandBbox
       deprecated: true
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       responses:
         '404':
           description: endpoint is gone
@@ -624,10 +625,10 @@ paths:
             text/xml:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Osm'
+                  - $ref: './schemas/OSM.yaml'
                   - type: array
                     items:
-                      $ref: '#/components/schemas/Changeset'
+                      $ref: './schemas/Changeset.yaml'
         '400':
           description: 'On misformed parameters. In particular, trying to provide both the UID and display name as user query parameters will result in this error.'
           content:
@@ -645,7 +646,7 @@ paths:
       description: posts a comment n a Changeset
       operationId: discussionComment
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -662,11 +663,11 @@ paths:
             application/xml:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Osm'
+                  - $ref: './schemas/OSM.yaml'
                   - type: object
                     properties:
                       changeset:
-                        $ref: '#/components/schemas/Changeset'
+                        $ref: './schemas/Changeset.yaml'
         '400':
           description: if the text field was not present
         '409':
@@ -683,7 +684,7 @@ paths:
       summary: subscribe to Changeset discussion
       operationId: discussionSubscribe
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -700,11 +701,11 @@ paths:
             application/xml:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Osm'
+                  - $ref: './schemas/OSM.yaml'
                   - type: object
                     properties:
                       changeset:
-                        $ref: '#/components/schemas/Changeset'
+                        $ref: './schemas/Changeset.yaml'
         '409':
           description: if the user is already subscribed to this changeset
       security:
@@ -719,7 +720,7 @@ paths:
       summary: Unsubscribe from Changeset discussion
       operationId: discussionUnsubscribe
       parameters:
-        - $ref: '#/components/parameters/chSetId'
+        - $ref: './parameters/chSetId.yaml'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -736,11 +737,11 @@ paths:
             application/xml:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Osm'
+                  - $ref: './schemas/OSM.yaml'
                   - type: object
                     properties:
                       changeset:
-                        $ref: '#/components/schemas/Changeset'
+                        $ref: './schemas/Changeset.yaml'
         '404':
           description: if the user is not subscribed to this changeset
       security:
@@ -755,15 +756,15 @@ paths:
       summary: creates a new Element
       operationId: createElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
+        - $ref: './parameters/elemType.yaml'
       requestBody:
         content:
           application/xml:
             schema:
               oneOf:
-                - $ref: '#/components/schemas/Node'
-                - $ref: '#/components/schemas/Way'
-                - $ref: '#/components/schemas/Relation'
+                - $ref: './schemas/Node.yaml'
+                - $ref: './schemas/Way.yaml'
+                - $ref: './schemas/Relation.yaml'
       responses:
         '200':
           description: Successful operation
@@ -801,8 +802,8 @@ paths:
       summary: Returns the XML representation of the element.
       operationId: updateElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
       responses:
         '200':
           description: Successful operation
@@ -810,9 +811,9 @@ paths:
             application/xml:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Node'
-                  - $ref: '#/components/schemas/Way'
-                  - $ref: '#/components/schemas/Relation'
+                  - $ref: './schemas/Node.yaml'
+                  - $ref: './schemas/Way.yaml'
+                  - $ref: './schemas/Relation.yaml'
         '404':
           description: Element of this Type and ID could not be found.
         '410':
@@ -827,16 +828,16 @@ paths:
       summary: update Element.
       operationId: updateElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
       requestBody:
         content:
           application/xml:
             schema:
               oneOf:
-                - $ref: '#/components/schemas/Node'
-                - $ref: '#/components/schemas/Way'
-                - $ref: '#/components/schemas/Relation'
+                - $ref: './schemas/Node.yaml'
+                - $ref: './schemas/Way.yaml'
+                - $ref: './schemas/Relation.yaml'
       responses:
         '200':
           description: Successful
@@ -871,17 +872,17 @@ paths:
       summary: delete element
       operationId: deleteElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
       requestBody:
         description: an xml representation of the element to be deleted.
         content:
           application/xml:
             schema:
               oneOf:
-                - $ref: '#/components/schemas/Node'
-                - $ref: '#/components/schemas/Way'
-                - $ref: '#/components/schemas/Relation'
+                - $ref: './schemas/Node.yaml'
+                - $ref: './schemas/Way.yaml'
+                - $ref: './schemas/Relation.yaml'
       responses:
         '200':
           description: Successful
@@ -919,8 +920,8 @@ paths:
       summary: returns all versions of an element.
       operationId: historyElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
       responses:
         '200':
           description: Success
@@ -930,9 +931,9 @@ paths:
                 type: array
                 items:
                   oneOf:
-                    - $ref: '#/components/schemas/Node'
-                    - $ref: '#/components/schemas/Way'
-                    - $ref: '#/components/schemas/Relation'
+                    - $ref: './schemas/Node.yaml'
+                    - $ref: './schemas/Way.yaml'
+                    - $ref: './schemas/Relation.yaml'
         '404': 
           description: When no element with the given id could be found
   
@@ -943,8 +944,8 @@ paths:
       summary: returns specific versions of an element.
       operationId: versionElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
         - name: version
           in: path
           required: true
@@ -958,9 +959,9 @@ paths:
               application/xml:
                 schema:
                   oneOf:
-                    - $ref: '#/components/schemas/Node'
-                    - $ref: '#/components/schemas/Way'
-                    - $ref: '#/components/schemas/Relation'
+                    - $ref: './schemas/Node.yaml'
+                    - $ref: './schemas/Way.yaml'
+                    - $ref: './schemas/Relation.yaml'
         '404': 
           description: When no element with the given id could be found
   
@@ -971,7 +972,7 @@ paths:
       summary: returns specific versions of an element
       operationId: multiVersionElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
+        - $ref: './parameters/elemType.yaml'
         - name: node
           in: query
           description: format "{elementId}v{elementVersion}" in a comma separated list
@@ -996,9 +997,9 @@ paths:
                 type: array
                 items:
                   oneOf:
-                    - $ref: '#/components/schemas/Node'
-                    - $ref: '#/components/schemas/Way'
-                    - $ref: '#/components/schemas/Relation'
+                    - $ref: './schemas/Node.yaml'
+                    - $ref: './schemas/Way.yaml'
+                    - $ref: './schemas/Relation.yaml'
         '400':
           description: On a malformed request
         '404':
@@ -1016,8 +1017,8 @@ paths:
         If the node does not exist or it isn't used in any ways an empty XML document is returned (apart from the <osm> elements)
       operationId: relationsOfElement
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
       responses:
         '200':
           description: Success
@@ -1027,9 +1028,9 @@ paths:
                 type: array
                 items:
                   oneOf:
-                    - $ref: '#/components/schemas/Node'
-                    - $ref: '#/components/schemas/Way'
-                    - $ref: '#/components/schemas/Relation'
+                    - $ref: './schemas/Node.yaml'
+                    - $ref: './schemas/Way.yaml'
+                    - $ref: './schemas/Relation.yaml'
   
   /api/0.6/node/{id}/ways:
     get:
@@ -1038,7 +1039,7 @@ paths:
       summary: all the ways in which the given node is used
       operationId: waysElementRelations
       parameters:
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemId.yaml'
       responses:
         '200':
           description: Success
@@ -1048,9 +1049,9 @@ paths:
                 type: array
                 items:
                   oneOf:
-                    - $ref: '#/components/schemas/Node'
-                    - $ref: '#/components/schemas/Way'
-                    - $ref: '#/components/schemas/Relation'
+                    - $ref: './schemas/Node.yaml'
+                    - $ref: './schemas/Way.yaml'
+                    - $ref: './schemas/Relation.yaml'
   
   /api/0.6/{elementType}/{id}/full:
     get:
@@ -1059,8 +1060,8 @@ paths:
       summary: retrieves a way or relation and all elements referenced by it
       operationId: fullElementRelations
       parameters:
-        - $ref: '#/components/parameters/elemType'
-        - $ref: '#/components/parameters/elemId'
+        - $ref: './parameters/elemType.yaml'
+        - $ref: './parameters/elemId.yaml'
       responses:
         '200':
           description: Success
@@ -1069,10 +1070,10 @@ paths:
               schema:
                 type: array
                 items:
-                  oneOf:
-                    - $ref: '#/components/schemas/Node'
-                    - $ref: '#/components/schemas/Way'
-                    - $ref: '#/components/schemas/Relation'
+                  anyOf:
+                    - $ref: './schemas/Node.yaml'
+                    - $ref: './schemas/Way.yaml'
+                    - $ref: './schemas/Relation.yaml'
         '404':
           description: When no element with the given id could be found
         '410':
@@ -1159,7 +1160,7 @@ paths:
       summary: update a GPX file
       operationId: updateTrack
       parameters:
-        - $ref: '#/components/parameters/gpxId'
+        - $ref: './parameters/gpxId.yaml'
       requestBody:
         content:
           multipart/form-data:
@@ -1195,7 +1196,7 @@ paths:
       summary: delete a GPX file
       operationId: deleteTrack
       parameters:
-        - $ref: '#/components/parameters/gpxId'
+        - $ref: './parameters/gpxId.yaml'
       responses:
         '200':
           description: Successful
@@ -1211,14 +1212,21 @@ paths:
       summary: metadata of a GPX file
       operationId: metaTrack
       parameters:
-        - $ref: '#/components/parameters/gpxId'
+        - $ref: './parameters/gpxId.yaml'
       responses:
         '200':
           description: details of gpx
+          content:
+            application/xml:
+              schema:
+                type: object
+                $ref: './schemas/GpxDetail.yaml'
       security:
         - oAuth2:
           - write_api
         - basicAuth: []
+  # continue download endpoint
+  # continue list of gpx details
   
   /api/0.6/gpx/{id}/data:
     get:
@@ -1227,7 +1235,7 @@ paths:
       summary: download a GPX file
       operationId: downloadTrack
       parameters:
-        - $ref: '#/components/parameters/gpxId'
+        - $ref: './parameters/gpxId.yaml'
       responses:
         '200':
           description: details of gpx
@@ -1243,7 +1251,7 @@ paths:
       summary: each public tracks meta data
       operationId: metaUserTracks
       parameters:
-        - $ref: '#/components/parameters/gpxId'
+        - $ref: './parameters/gpxId.yaml'
       responses:
         '200':
           description: details of gpx
@@ -1254,359 +1262,7 @@ paths:
              
 
 
-
-  /echo:
-    post:
-      summary: echo to see request and response version of an abject
-      operationId: echo
-      requestBody:
-        content:
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Relation'
-      responses:
-        '200':
-          description: echo
-          content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Relation'
-
-
 components:
-  parameters:
-    elemType:
-      name: elemType
-      in: path
-      required: true
-      description: type of the Element
-      schema:
-        enum:
-          - node
-          - way
-          - relation
-
-    elemId:
-      name: id
-      in: path
-      required: true
-      description: id of the Element
-      schema:
-          type: integer
-          format: int64
-    chSetId:
-      name: id
-      in: path
-      required: true
-      description: id of the Element
-      schema:
-          type: integer
-          format: int64
-    gpxId:
-      name: id
-      in: path
-      required: true
-      description: id of the Element
-      schema:
-          type: integer
-          format: int64
-
-  schemas:
-    Osm:
-      properties:
-        version:
-          type: string
-          readOnly: true
-          example: 0.6
-          xml:
-            attribute: true
-        generator:
-          type: string
-          readOnly: true
-          example: OpenStreetMap server
-          xml:
-            attribute: true
-        copyright:
-          type: string
-          readOnly: true
-          example: OpenStreetMap and contributors
-          xml:
-            attribute: true
-        attribution:
-          type: string
-          readOnly: true
-          example: https://www.openstreetmap.org/copyright
-          xml:
-            attribute: true
-        license:
-          type: string
-          readOnly: true
-          example: https://opendatacommons.org/licenses/odbl/1-0/
-          xml:
-            attribute: true
-      xml:
-        name: osm
-    Changeset:
-      properties:
-        id:
-          type: string
-          example: 10
-          readOnly: true
-          xml:
-            attribute: true
-        user:
-          type: string
-          example: fred
-          readOnly: true
-          xml:
-            attribute: true
-        uid:
-          type: string
-          example: 123
-          readOnly: true
-          xml:
-            attribute: true
-        created_at:
-          type: string
-          format: date-time
-          example: '2008-11-08T19:07:39+01:00'
-          readOnly: true
-          xml:
-            attribute: true
-        open:
-          type: string
-          enum:
-            - 'true'
-            - 'false'
-          readOnly: true
-          xml:
-            attribute: true
-        min_lon:
-          type: number
-          readOnly: true
-          xml:
-            attribute: true
-        min_lat:
-          type: number
-          readOnly: true
-          xml:
-            attribute: true
-        max_lon:
-          type: number
-          readOnly: true
-          xml:
-            attribute: true
-        max_lat:
-          type: number
-          readOnly: true
-          xml:
-            attribute: true
-        tag:
-          type: array
-          items:
-            type: object
-            properties:
-              key: # TODO comment is required
-                type: string
-                example: comment
-                xml:
-                  name: k
-                  attribute: true
-              value:
-                type: string
-                example: Added some Trees
-                xml:
-                  name: v
-                  attribute: true
-            xml:
-              wrapped: true
-        discussion:
-          type: object
-          properties:
-            comment:
-              type: array
-              items:
-                type: object
-                properties:
-                  date:
-                    type: string
-                    format: date-time
-                    example: '2015-01-01T18:56:48Z'
-                    readOnly: true
-                    xml:
-                      attribute: true
-                  uid:
-                    type: string
-                    example: 1841
-                    readOnly: true
-                    xml:
-                      attribute: true
-                  user:
-                    type: string
-                    example: metaodi
-                    readOnly: true
-                    xml:
-                      attribute: true
-                  text:
-                    type: string
-                    example: Did you verify those street names?
-                xml:
-                  wrapped: true
-      xml:
-        name: changeset
-    Tag:
-      properties:
-        key:
-          type: string
-          description: key
-          example: natural
-          xml:
-            name: k
-            attribute: true
-        value:
-          type: string
-          description: value
-          example: tree
-          xml:
-            name: v
-            attribute: true
-      xml:
-        name: tag
-      required:
-        - key
-    Element:
-      properties:
-        id:
-          type: string
-          readOnly: false # need to be set for update
-          description: id of that Node
-          xml:
-            attribute: true
-        version:
-          type: string
-          readOnly: false # needs to be set for update
-          description: longitude of Node
-          xml:
-            attribute: true
-        changeset:
-          type: string
-          description: changeset id of your open changeset
-          xml:
-            attribute: true
-        user:
-          type: string
-          readOnly: true
-          description: longitude of Node
-          xml:
-            attribute: true
-        userId:
-          type: string
-          readOnly: true
-          description: longitude of Node
-          xml:
-            name: uid
-            attribute: true
-        visible:
-          type: string
-          enum:
-            - true
-            - false
-          readOnly: false # can be set at update
-          description: longitude of Node
-          xml:
-            attribute: true
-        timestamp:
-          type: string
-          format: date-time
-          readOnly: true
-          description: last Modified
-          xml:
-            attribute: true
-        tag:
-          type: array
-          items:
-            $ref: '#/components/schemas/Tag'
-    Node:
-      allOf:
-        - $ref: '#/components/schemas/Element'
-        - type: object
-          properties:
-            lat:
-              type: string
-              description: latitude of Node
-              xml:
-                attribute: true
-            lon:
-              type: string
-              description: longitude of Node
-              xml:
-                attribute: true
-      required:
-        - lat
-        - lon
-    Way:
-      allOf:
-        - $ref: '#/components/schemas/Element'
-        - type: object
-          properties:
-            node:
-              type: array
-              minItems: 2
-              maxItems: 2000
-              items:
-                type: object
-                properties:
-                  reference:
-                    type: string
-                    description: id of a node
-                    xml:
-                      name: ref
-                      attribute: true
-              xml:
-                name: nd
-      required:
-        - node
-    Relation:
-      allOf:
-        - $ref: '#/components/schemas/Element'
-        - type: object
-          properties:
-            member:
-              type: array
-              minItems: 2 #not sure
-              items:
-                type: object
-                properties:
-                  type:
-                    type: string
-                    example: node
-                    enum:
-                      - node
-                      - way
-                      - relation
-                    xml:
-                      attribute: true
-                  role:
-                    type: string
-                    description: <cite>A member of a relation can optionally have a role which describes the part that a particular feature plays within a relation</cite> <a href="https://wiki.openstreetmap.org/wiki/Relation#Roles"><sub>cite</sub></a>
-                    xml:
-                      attribute: true
-                  reference:
-                    type: string
-                    description: id of a node
-                    xml:
-                      name: ref
-                      attribute: true
-          required:
-            - member
-            - type
-            - reference
-    User:
-      allOf:
-        - $ref: '#/components/schemas/Osm'
-        - type: object
-        
-
   securitySchemes:
     basicAuth:
       type: http

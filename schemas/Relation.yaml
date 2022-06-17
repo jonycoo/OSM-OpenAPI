@@ -1,0 +1,36 @@
+Relation:
+  type: object
+  allOf:
+    - $ref: './Element.yaml'
+    - type: object
+      properties:
+        member:
+          type: array
+          minItems: 2 #not sure
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: node
+                enum:
+                  - node
+                  - way
+                  - relation
+                xml:
+                  attribute: true
+              role:
+                type: string
+                description: <cite>A member of a relation can optionally have a role which describes the part that a particular feature plays within a relation</cite> <a href="https://wiki.openstreetmap.org/wiki/Relation#Roles"><sub>cite</sub></a>
+                xml:
+                  attribute: true
+              reference:
+                type: string
+                description: id of a node
+                xml:
+                  name: ref
+                  attribute: true
+      required:
+        - member
+        - type
+        - reference

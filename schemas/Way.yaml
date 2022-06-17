@@ -1,0 +1,26 @@
+Way:
+  type: object
+  allOf:
+    - $ref: './Element.yaml'
+    - type: object
+      properties:
+        node:
+          type: array
+          minItems: 2
+          maxItems: 2000
+          items:
+            type: object
+            properties:
+              reference:
+                type: string
+                description: id of a node
+                xml:
+                  name: ref
+                  attribute: true
+          xml:
+            name: nd
+            wrapped: true
+  xml:
+    name: way
+  required:
+    - node

@@ -1,0 +1,9 @@
+name: elemType
+in: path
+required: true
+description: type of the Element
+schema:
+  enum:
+    - node
+    - way
+    - relation
