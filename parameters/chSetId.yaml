@@ -1,4 +1,4 @@
-name: id
+name: ch_id
 in: path
 required: true
 description: id of the Element

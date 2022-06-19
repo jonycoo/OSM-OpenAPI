@@ -369,7 +369,7 @@ paths:
           - write_api
         - basicAuth: []
 
-  /api/0.6/changeset/{id}:
+  /api/0.6/changeset/{ch_id}:
     get:
       tags:
         - Changesets
@@ -449,8 +449,8 @@ paths:
         - oAuth2:
           - write_api
         - basicAuth: []
-
-  /api/0.6/changeset/{id}/close:
+  
+  /api/0.6/changeset/{ch_id}/close:
     put:
       tags:
         - Changesets
@@ -474,7 +474,7 @@ paths:
           - write_api
         - basicAuth: []
 
-  /api/0.6/changeset/{id}/download:
+  /api/0.6/changeset/{ch_id}/download:
     get:
       tags:
         - Changesets
@@ -498,7 +498,7 @@ paths:
         '404':
           description: When no changeset with the given id could be found
 
-  /api/0.6/changeset/{id}/upload:
+  /api/0.6/changeset/{ch_id}/upload:
     post:
       tags:
         - Changesets
@@ -537,7 +537,7 @@ paths:
           - write_api
         - basicAuth: []
 
-  /api/0.6/changeset/{id}/expand_bbox:
+  /api/0.6/changeset/{ch_id}/expand_bbox:
     post:
       tags:
         - Changesets
@@ -638,7 +638,7 @@ paths:
 
 
 
-  /api/0.6/changeset/{id}/comment:
+  /api/0.6/changeset/{ch_id}/comment:
     post:
       tags:
         - Changeset discussion
@@ -677,7 +677,7 @@ paths:
           - write_api
         - basicAuth: []
 
-  /api/0.6/changeset/{id}/subscribe:
+  /api/0.6/changeset/{ch_id}/subscribe:
     post:
       tags:
         - Changeset discussion
@@ -713,7 +713,7 @@ paths:
           - write_api
         - basicAuth: []
 
-  /api/0.6/changeset/{id}/unsubscribe:
+  /api/0.6/changeset/{ch_id}/unsubscribe:
     post:
       tags:
         - Changeset discussion
@@ -795,7 +795,7 @@ paths:
           - write_api
         - basicAuth: []
   
-  /api/0.6/{elementType}/{id}:
+  /api/0.6/{elementType}/{e_id}:
     get:
       tags:
         - Elements
@@ -913,7 +913,7 @@ paths:
           - write_api
         - basicAuth: []
   
-  /api/0.6/{elementType}/{id}/history:
+  /api/0.6/{elementType}/{e_id}/history:
     get:
       tags:
         - Elements
@@ -937,7 +937,7 @@ paths:
         '404': 
           description: When no element with the given id could be found
   
-  /api/0.6/{elementType}/{id}/{version}:
+  /api/0.6/{elementType}/{e_id}/{version}:
     get:
       tags:
         - Elements
@@ -1007,7 +1007,7 @@ paths:
         '412':
           description: If the URI was too long (tested to be > 8213 characters in the URI, or > 725 elements for 10 digit IDs when not specifying versions)
   
-  /api/0.6/{elementType}/{id}/relations:
+  /api/0.6/{elementType}/{e_id}/relations:
     get:
       tags:
         - Elements
@@ -1032,7 +1032,7 @@ paths:
                     - $ref: './schemas/Way.yaml'
                     - $ref: './schemas/Relation.yaml'
   
-  /api/0.6/node/{id}/ways:
+  /api/0.6/node/{e_id}/ways:
     get:
       tags:
         - Elements
@@ -1053,7 +1053,7 @@ paths:
                     - $ref: './schemas/Way.yaml'
                     - $ref: './schemas/Relation.yaml'
   
-  /api/0.6/{elementType}/{id}/full:
+  /api/0.6/{elementType}/{e_id}/full:
     get:
       tags:
         - Elements
@@ -1153,7 +1153,7 @@ paths:
           - write_api
         - basicAuth: []
   
-  /api/0.6/gpx/{id}:
+  /api/0.6/gpx/{gpx_id}:
     put:
       tags:
         - GPS traces
@@ -1205,7 +1205,7 @@ paths:
           - write_api
         - basicAuth: []
   
-  /api/0.6/gpx/{id}/details:
+  /api/0.6/gpx/{gpx_id}/details:
     get:
       tags:
         - GPS traces
@@ -1228,7 +1228,7 @@ paths:
   # continue download endpoint
   # continue list of gpx details
   
-  /api/0.6/gpx/{id}/data:
+  /api/0.6/gpx/{gpx_id}/data:
     get:
       tags:
         - GPS traces
@@ -1272,12 +1272,11 @@ components:
       description: For more information, see https://wiki.openstreetmap.org/wiki/OAuth#Registering_your_application_as_OAuth_2.0_consumer
       flows:
         authorizationCode:
-          authorizationUrl: /oauth2/authorize
-          tokenUrl: /oauth2/token
+          authorizationUrl: https://master.apis.dev.openstreetmap.org/oauth2/authorize
+          tokenUrl: https://master.apis.dev.openstreetmap.org/oauth2/token
           scopes:
             read_prefs: read their user preferences
             write_prefs: modify their user preferences
-            write_diary: create diary entries, comments and make friends
             write_api: modify the map
             read_gpx: read their private GPS traces
             write_gpx: upload GPS traces
